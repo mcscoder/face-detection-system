@@ -12,14 +12,14 @@
 | Phase | Status | Outcome |
 |---|---|---|
 | Documentation baseline | done | Core docs created and aligned to PRD |
-| Backend foundation | in-progress | FastAPI project, config, auth, health endpoints |
+| Backend foundation | in-progress | FastAPI project, config, auth, health/info endpoints, metadata filters, admin seed command |
 | Recognition pipeline | in-progress | Face detect, embed, compare, decision logic |
-| Database and schema | in-progress | PostgreSQL schema, pgvector, audit tables |
-| Client foundation | in-progress | Flutter mobile and web shells, auth, API wiring |
-| Enrollment workflows | planned | Person CRUD, enrollment wizard, template management |
-| Recognition UX | planned | Capture flow, match result, error states |
-| Testing and hardening | in-progress | Unit, integration, and edge-case coverage |
-| Deployment packaging | in-progress | Local setup commands, database schema setup, HTTPS local option |
+| Database and schema | in-progress | PostgreSQL schema, pgvector, audit tables, metadata query path |
+| Client foundation | in-progress | Flutter Android shell, auth, demo/live API wiring, live identify upload, guided enrollment |
+| Enrollment workflows | in-progress | Guided live-camera enrollment exists; edit/template management pending |
+| Recognition UX | in-progress | Live camera capture upload, match result, error states |
+| Testing and hardening | in-progress | Unit/API coverage plus opt-in database and GPU smoke tests |
+| Deployment packaging | in-progress | Local setup, admin seed, backup/restore, GPU smoke commands |
 
 ## Phase Details
 
@@ -31,7 +31,7 @@
 ### 2. Backend Foundation
 
 - Status: in-progress
-- Current note: backend package now uses `uv`; app shell, health/info routes, auth helpers, and settings exist
+- Current note: backend package now uses `uv`; app shell, health/info routes, auth helpers, role-gated `active_template_count`, metadata filters, settings, and admin seed command exist
 - Tasks:
   - create FastAPI project layout
   - add auth and RBAC skeleton
@@ -51,7 +51,7 @@
 ### 4. Database And Schema
 
 - Status: in-progress
-- Current note: schema SQL, repositories, and backend setup guide exist
+- Current note: schema SQL, repositories, metadata filters, and backend setup guide exist; active template counts exclude deleted people
 - Tasks:
   - define `people`, `face_templates`, and `recognition_events`
   - add `pgvector` support
@@ -61,7 +61,7 @@
 ### 5. Client Foundation
 
 - Status: in-progress
-- Current note: Flutter app shell, operational screens, API abstraction, and widget/state tests exist; platform run folders pending
+- Current note: Flutter app shell, Android platform files, operational screens, demo/live API abstraction, live-camera identify upload, prompt-gated guided live-camera enrollment, multipart filename sanitization, and widget/state tests exist; client tests/analyze pass; web platform files and manual target-phone smoke pending
 - Tasks:
   - bootstrap Flutter app
   - add mobile-first capture flow
@@ -70,17 +70,18 @@
 
 ### 6. Enrollment And Recognition UX
 
-- Status: planned
+- Status: in-progress
+- Current note: client can create people, guide five live-camera enrollment prompts with backend-gated sample upload, and upload live-camera captures to identify; target-phone enrollment smoke and full end-to-end audit verification remain pending
 - Tasks:
   - person create/edit screens
-  - enrollment wizard
+  - guided enrollment flow
   - recognition result screen
   - event and audit views
 
 ### 7. Testing And Hardening
 
 - Status: in-progress
-- Current note: backend deterministic tests pass, client tests pass, and Flutter analysis is clean; GPU smoke remains pending
+- Current note: backend deterministic tests pass, client tests/analyze pass, Android release APK build passes, and database/GPU smoke tests are opt-in and skip unless env vars are set
 - Tasks:
   - unit tests for service logic
   - integration tests for API paths
@@ -90,7 +91,7 @@
 ### 8. Deployment Packaging
 
 - Status: in-progress
-- Current note: backend and client setup commands live only in their component READMEs
+- Current note: backend/client setup, admin seed, backup/restore, database smoke, GPU smoke, and release APK build commands are documented; target-phone and end-to-end hardware verification remain pending
 - Tasks:
   - local install guide
   - database backup and restore command

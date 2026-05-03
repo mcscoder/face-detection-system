@@ -26,8 +26,7 @@ class ServerInfo {
     final modelMap = model is Map<String, Object?> ? model : const {};
     final loaded = modelMap['loaded'] == true ? 'model loaded' : 'model idle';
     return ServerInfo(
-      name:
-          json['service'] as String? ??
+      name: json['service'] as String? ??
           json['name'] as String? ??
           'Face Detection Server',
       version: json['version'] as String? ?? 'unknown',
@@ -55,8 +54,7 @@ class PersonSummary {
   factory PersonSummary.fromJson(Map<String, Object?> json) {
     return PersonSummary(
       id: json['person_id'] as String? ?? json['id'] as String? ?? '',
-      displayName:
-          json['display_name'] as String? ??
+      displayName: json['display_name'] as String? ??
           json['name'] as String? ??
           'Unnamed',
       jobTitle: json['job_title'] as String?,
@@ -64,8 +62,34 @@ class PersonSummary {
       metadata: json['extra_data'] is Map<String, Object?>
           ? json['extra_data'] as Map<String, Object?>
           : json['metadata'] is Map<String, Object?>
-          ? json['metadata'] as Map<String, Object?>
-          : const {},
+              ? json['metadata'] as Map<String, Object?>
+              : const {},
+    );
+  }
+}
+
+class FaceTemplateSummary {
+  const FaceTemplateSummary({
+    required this.id,
+    required this.personId,
+    required this.modelPack,
+    required this.isActive,
+    this.qualityScore,
+  });
+
+  final String id;
+  final String personId;
+  final String modelPack;
+  final bool isActive;
+  final double? qualityScore;
+
+  factory FaceTemplateSummary.fromJson(Map<String, Object?> json) {
+    return FaceTemplateSummary(
+      id: json['id'] as String? ?? '',
+      personId: json['person_id'] as String? ?? '',
+      modelPack: json['model_pack'] as String? ?? 'unknown',
+      isActive: json['is_active'] == true,
+      qualityScore: _doubleValue(json['quality_score']),
     );
   }
 }
@@ -130,8 +154,7 @@ class RecognitionEvent {
     return RecognitionEvent(
       id: json['event_id'] as String? ?? json['id'] as String? ?? '',
       decision: RecognitionResult.decisionFromText(json['decision'] as String?),
-      createdAt:
-          DateTime.tryParse(json['created_at'] as String? ?? '') ??
+      createdAt: DateTime.tryParse(json['created_at'] as String? ?? '') ??
           DateTime(1970),
       personId: json['person_id'] as String?,
     );
@@ -146,12 +169,10 @@ class SystemConfig {
 
   factory SystemConfig.fromJson(Map<String, Object?> json) {
     return SystemConfig(
-      threshold:
-          _doubleValue(json['recognition_threshold']) ??
+      threshold: _doubleValue(json['recognition_threshold']) ??
           _doubleValue(json['threshold']) ??
           0.5,
-      retentionDays:
-          json['probe_retention_days'] as int? ??
+      retentionDays: json['probe_retention_days'] as int? ??
           json['retention_days'] as int? ??
           30,
     );

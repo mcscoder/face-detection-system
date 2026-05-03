@@ -45,6 +45,7 @@ class ApiFailure {
   }
 
   static String _messageFor(int statusCode, String? code) {
+    if (statusCode == 0) return 'Server unavailable.';
     if (statusCode == 401) return 'Session expired. Login again.';
     if (statusCode == 403) return 'Not allowed for this role.';
     if (statusCode == 404) return 'Record not found.';
@@ -56,6 +57,8 @@ class ApiFailure {
       'multi_face' || 'MULTIPLE_FACES' => 'More than one face detected.',
       'low_quality' || 'LOW_QUALITY' => 'Image quality is too low.',
       'low_score' || 'LOW_SCORE' => 'Similarity score is below threshold.',
+      'WRONG_POSE' => 'Follow the current face prompt.',
+      'INVALID_PROMPT' => 'Face prompt is invalid.',
       'INVALID_IMAGE' => 'Image file is invalid.',
       _ => 'Request failed.',
     };

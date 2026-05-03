@@ -6,7 +6,9 @@ import 'screens/shell_screen.dart';
 import 'state/app_controller.dart';
 
 class FaceDetectionClientApp extends StatefulWidget {
-  const FaceDetectionClientApp({super.key});
+  const FaceDetectionClientApp({super.key, required this.transport});
+
+  final ApiTransport transport;
 
   @override
   State<FaceDetectionClientApp> createState() => _FaceDetectionClientAppState();
@@ -18,8 +20,7 @@ class _FaceDetectionClientAppState extends State<FaceDetectionClientApp> {
   @override
   void initState() {
     super.initState();
-    controller = AppController(const ApiClient(DemoApiTransport()))
-      ..loadServerInfo();
+    controller = AppController(ApiClient(widget.transport))..loadServerInfo();
   }
 
   @override

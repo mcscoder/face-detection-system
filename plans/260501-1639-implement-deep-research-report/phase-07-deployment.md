@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Deployment"
-status: pending
+status: in-progress
 priority: P2
 effort: "3d"
 dependencies: [6]
@@ -56,7 +56,7 @@ Runtime layout:
 3. Add server run command that preloads model and exposes health/info endpoints.
 4. Add backup and restore commands for PostgreSQL and storage directory.
 5. Add optional HTTPS local notes for web camera demo over LAN.
-6. Document current client setup, test, and analysis commands; keep run/build pending until platform folders exist.
+6. Document current client setup, test, analysis, run, and Android build commands; keep web run/build pending until web platform files exist.
 7. Add operational checklist: GPU provider, active template count, threshold, retention, event logging.
 8. Update docs and changelog to reflect implemented behavior.
 
@@ -64,19 +64,19 @@ Runtime layout:
 
 - [x] Setup commands documented.
 - [x] Database schema setup verified.
-- [ ] Backup/restore commands documented.
-- [ ] Server info verifies model/GPU status.
-- [ ] Mobile LAN demo path documented.
+- [x] Backup/restore commands documented.
+- [x] Server info verifies model/GPU status.
+- [x] Mobile LAN demo path documented.
 - [x] Web HTTPS local path documented or implemented.
 - [x] Docs synced to actual implementation.
 
 ## Success Criteria
 
-- [ ] Fresh local setup can start server and database.
-- [ ] `/v1/server/info` reports model pack, providers, active template count, and version info.
-- [ ] Backup and restore preserve people, templates, events, and storage artifacts.
-- [ ] Demo checklist proves enrollment -> identify -> audit event.
-- [ ] Docs no longer claim unimplemented features are complete.
+  - [x] Fresh local setup can start server and database.
+  - [x] `/v1/server/info` reports model pack, providers, active template count, and version info.
+  - [ ] Backup and restore preserve people, templates, events, and storage artifacts.
+  - [ ] Demo checklist proves enrollment -> identify -> audit event.
+  - [x] Docs no longer claim unimplemented features are complete.
 
 ## Risk Assessment
 

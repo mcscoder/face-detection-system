@@ -8,8 +8,18 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[PersonDetail])
-def list_people(query: str | None = None, repos=Depends(repositories), _=Depends(require_role(Role.OPERATOR))):
-    return repos["people"].list(query=query)
+def list_people(
+    query: str | None = None,
+    metadata_key: str | None = None,
+    metadata_value: str | None = None,
+    repos=Depends(repositories),
+    _=Depends(require_role(Role.OPERATOR)),
+):
+    return repos["people"].list(
+        query=query,
+        metadata_key=metadata_key,
+        metadata_value=metadata_value,
+    )
 
 
 @router.post("", response_model=PersonDetail, status_code=status.HTTP_201_CREATED)
@@ -42,4 +52,3 @@ def update_person(
 def delete_person(person_id: str, repos=Depends(repositories), _=Depends(require_role(Role.ADMIN))):
     if not repos["people"].soft_delete(person_id):
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="NOT_FOUND")
-

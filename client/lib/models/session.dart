@@ -19,8 +19,7 @@ class Session {
     final roles = json['roles'];
     return Session(
       token: json['access_token'] as String? ?? '',
-      userName:
-          json['display_name'] as String? ??
+      userName: json['display_name'] as String? ??
           json['user_name'] as String? ??
           'Operator',
       role: _roleFromList(roles) ?? _roleFromText(json['role'] as String?),

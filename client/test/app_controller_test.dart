@@ -15,4 +15,23 @@ void main() {
 
     controller.dispose();
   });
+
+  test('creates person and uploads enrollment sample', () async {
+    final controller = AppController(const ApiClient(DemoApiTransport()));
+
+    await controller.login('admin', 'password');
+    final person = await controller.createPerson(displayName: 'New Person');
+    final template = await controller.uploadEnrollmentSample(
+      personId: person!.id,
+      fileName: 'sample.jpg',
+      bytes: const [1, 2, 3],
+      expectedPose: 'face_forward',
+    );
+
+    expect(person.id, 'p-1002');
+    expect(template?.isActive, isTrue);
+    expect(template?.qualityScore, 0.87);
+
+    controller.dispose();
+  });
 }

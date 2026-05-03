@@ -32,40 +32,40 @@ class ResultScreen extends StatelessWidget {
 ) {
   return switch (decision) {
     RecognitionDecision.allow => (
-      label: 'Allowed',
-      tone: BannerTone.success,
-      icon: Icons.check_circle,
-    ),
+        label: 'Allowed',
+        tone: BannerTone.success,
+        icon: Icons.check_circle,
+      ),
     RecognitionDecision.deny => (
-      label: 'Denied',
-      tone: BannerTone.warning,
-      icon: Icons.block,
-    ),
+        label: 'Denied',
+        tone: BannerTone.warning,
+        icon: Icons.block,
+      ),
     RecognitionDecision.review => (
-      label: 'Needs review',
-      tone: BannerTone.warning,
-      icon: Icons.manage_search,
-    ),
+        label: 'Needs review',
+        tone: BannerTone.warning,
+        icon: Icons.manage_search,
+      ),
     RecognitionDecision.noFace => (
-      label: 'No face detected',
-      tone: BannerTone.warning,
-      icon: Icons.face_retouching_off,
-    ),
+        label: 'No face detected',
+        tone: BannerTone.warning,
+        icon: Icons.face_retouching_off,
+      ),
     RecognitionDecision.multiFace => (
-      label: 'Multiple faces detected',
-      tone: BannerTone.warning,
-      icon: Icons.groups,
-    ),
+        label: 'Multiple faces detected',
+        tone: BannerTone.warning,
+        icon: Icons.groups,
+      ),
     RecognitionDecision.lowQuality => (
-      label: 'Low image quality',
-      tone: BannerTone.warning,
-      icon: Icons.blur_on,
-    ),
+        label: 'Low image quality',
+        tone: BannerTone.warning,
+        icon: Icons.blur_on,
+      ),
     RecognitionDecision.error => (
-      label: 'System error',
-      tone: BannerTone.error,
-      icon: Icons.error,
-    ),
+        label: 'System error',
+        tone: BannerTone.error,
+        icon: Icons.error,
+      ),
   };
 }
 

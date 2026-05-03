@@ -73,9 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: state.isBusy
                             ? null
                             : () => widget.controller.login(
-                                userName.text,
-                                password.text,
-                              ),
+                                  userName.text,
+                                  password.text,
+                                ),
                         icon: const Icon(Icons.login),
                         label: Text(state.isBusy ? 'Signing in...' : 'Login'),
                       ),

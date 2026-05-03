@@ -6,6 +6,10 @@ class FakeModel:
     def extract_single_face(self, image):
         if image == b"no-face":
             raise ValueError("NO_FACE")
+        if image == b"multi-face":
+            raise ValueError("MULTIPLE_FACES")
+        if image == b"low-quality":
+            raise ValueError("LOW_QUALITY")
         return ExtractedFace(embedding=[0.1, 0.2], quality_score=0.9)
 
 
@@ -21,6 +25,11 @@ class FakeTemplates:
                 "access_status": "active",
             }
         ]
+
+
+class EmptyTemplates:
+    def find_nearest(self, embedding, limit=1):
+        return []
 
 
 class FakeEvents:
@@ -64,3 +73,39 @@ def test_identify_records_failure_event():
     assert result["failure_reason"] == "NO_FACE"
     assert events.rows[0]["failure_reason"] == "NO_FACE"
 
+
+def test_identify_records_multiple_faces_failure():
+    events = FakeEvents()
+    service = RecognitionService(
+        FakeModel(), FakeTemplates(), events, FakeStorage(), 0.45, save_probe=False
+    )
+
+    result = service.identify(b"multi-face", None, "jpg")
+
+    assert result["failure_reason"] == "MULTIPLE_FACES"
+    assert events.rows[0]["failure_reason"] == "MULTIPLE_FACES"
+
+
+def test_identify_records_low_quality_failure():
+    events = FakeEvents()
+    service = RecognitionService(
+        FakeModel(), FakeTemplates(), events, FakeStorage(), 0.45, save_probe=False
+    )
+
+    result = service.identify(b"low-quality", None, "jpg")
+
+    assert result["failure_reason"] == "LOW_QUALITY"
+    assert events.rows[0]["failure_reason"] == "LOW_QUALITY"
+
+
+def test_identify_records_low_score_without_template_match():
+    events = FakeEvents()
+    service = RecognitionService(
+        FakeModel(), EmptyTemplates(), events, FakeStorage(), 0.45, save_probe=False
+    )
+
+    result = service.identify(b"image", None, "jpg")
+
+    assert result["matched"] is False
+    assert result["failure_reason"] == "LOW_SCORE"
+    assert events.rows[0]["failure_reason"] == "LOW_SCORE"

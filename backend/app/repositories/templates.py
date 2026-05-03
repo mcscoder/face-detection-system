@@ -47,6 +47,18 @@ class FaceTemplateRepository:
             )
             return cur.rowcount > 0
 
+    def count_active(self) -> int:
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT count(*) AS count
+                FROM face_templates ft
+                JOIN people p ON p.id = ft.person_id
+                WHERE ft.is_active = true AND p.is_deleted = false
+                """
+            )
+            return int(cur.fetchone()["count"])
+
     def find_nearest(self, embedding: list[float], limit: int = 1) -> list[dict[str, Any]]:
         with self.conn.cursor() as cur:
             cur.execute(
@@ -67,4 +79,3 @@ class FaceTemplateRepository:
 
 def _vector_literal(values: list[float]) -> str:
     return "[" + ",".join(f"{value:.8f}" for value in values) + "]"
-

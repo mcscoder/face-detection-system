@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 
 from app.api.dependencies import local_storage, model_loader, repositories, require_role
 from app.auth.roles import Role
@@ -13,6 +13,7 @@ router = APIRouter()
 @router.post("/{person_id}/samples", response_model=FaceTemplateResponse)
 async def upload_sample(
     person_id: str,
+    expected_pose: str | None = Form(None),
     file: UploadFile = File(...),
     repos=Depends(repositories),
     model=Depends(model_loader),
@@ -27,7 +28,9 @@ async def upload_sample(
     extension = "png" if file.content_type == "image/png" else "jpg"
     service = EnrollmentService(model, repos["templates"], storage)
     try:
-        return service.upload_sample(person_id, content, extension)
+        return service.upload_sample(person_id, content, extension, expected_pose)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="MODEL_UNAVAILABLE") from exc
 

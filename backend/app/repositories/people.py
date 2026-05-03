@@ -23,15 +23,34 @@ class PeopleRepository:
             )
             return cur.fetchone()
 
-    def list(self, query: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
-        params: list[Any] = [limit]
-        where = "WHERE is_deleted = false"
+    def list(
+        self,
+        query: str | None = None,
+        limit: int = 50,
+        metadata_key: str | None = None,
+        metadata_value: str | None = None,
+    ) -> list[dict[str, Any]]:
+        params: list[Any] = []
+        where = ["is_deleted = false"]
         if query:
-            where += " AND (display_name ILIKE %s OR employee_code ILIKE %s)"
-            params = [f"%{query}%", f"%{query}%", limit]
+            where.append("(display_name ILIKE %s OR employee_code ILIKE %s)")
+            params.extend([f"%{query}%", f"%{query}%"])
+        if metadata_key:
+            if metadata_value is None:
+                where.append("extra_data ? %s")
+                params.append(metadata_key)
+            else:
+                where.append("extra_data ->> %s = %s")
+                params.extend([metadata_key, metadata_value])
+        params.append(limit)
         with self.conn.cursor() as cur:
             cur.execute(
-                f"SELECT * FROM people {where} ORDER BY created_at DESC LIMIT %s",
+                """
+                SELECT * FROM people
+                WHERE {}
+                ORDER BY created_at DESC
+                LIMIT %s
+                """.format(" AND ".join(where)),
                 params,
             )
             return list(cur.fetchall())
@@ -77,4 +96,3 @@ class PeopleRepository:
                 (person_id,),
             )
             return cur.rowcount > 0
-

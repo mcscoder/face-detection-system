@@ -1,8 +1,9 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 from app.schemas.people import PersonSummary
+from app.schemas.validators import string_id
 
 
 class Decision(str, Enum):
@@ -19,6 +20,8 @@ class FaceTemplateResponse(BaseModel):
     is_active: bool
     quality_score: float | None = None
 
+    _string_ids = field_validator("id", "person_id", mode="before")(string_id)
+
 
 class RecognitionResponse(BaseModel):
     event_id: str
@@ -30,3 +33,10 @@ class RecognitionResponse(BaseModel):
     threshold: float
     failure_reason: str | None = None
     person_summary: PersonSummary | None = None
+
+    _string_ids = field_validator(
+        "event_id",
+        "person_id",
+        "face_template_id",
+        mode="before",
+    )(string_id)

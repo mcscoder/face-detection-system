@@ -4,9 +4,10 @@ import '../state/app_controller.dart';
 import '../widgets/status_banner.dart';
 
 class PeopleScreen extends StatelessWidget {
-  const PeopleScreen({super.key, required this.controller});
+  const PeopleScreen({super.key, required this.controller, this.onAddPerson});
 
   final AppController controller;
+  final VoidCallback? onAddPerson;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class PeopleScreen extends StatelessWidget {
                 Text('People', style: Theme.of(context).textTheme.titleLarge),
                 const Spacer(),
                 FilledButton.icon(
-                  onPressed: canAdmin ? () {} : null,
+                  onPressed: canAdmin ? onAddPerson : null,
                   icon: const Icon(Icons.person_add),
                   label: const Text('Add'),
                 ),

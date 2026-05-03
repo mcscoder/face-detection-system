@@ -30,20 +30,44 @@ class ApiClient {
     );
   }
 
-  Future<ApiResult<Object?>> uploadEnrollmentSample({
+  Future<ApiResult<PersonSummary>> createPerson({
+    required String token,
+    required String displayName,
+    String? employeeCode,
+    String? jobTitle,
+  }) async {
+    return _mapObject(
+      await _transport.postJson(
+          '/v1/people',
+          {
+            'display_name': displayName,
+            if (employeeCode != null && employeeCode.isNotEmpty)
+              'employee_code': employeeCode,
+            if (jobTitle != null && jobTitle.isNotEmpty) 'job_title': jobTitle,
+            'extra_data': <String, Object?>{},
+          },
+          token: token),
+      PersonSummary.fromJson,
+    );
+  }
+
+  Future<ApiResult<FaceTemplateSummary>> uploadEnrollmentSample({
     required String token,
     required String personId,
     required String fileName,
     required List<int> bytes,
+    required String expectedPose,
   }) async {
-    return _mapRaw(
+    return _mapObject(
       await _transport.postMultipart(
         '/v1/faces/$personId/samples',
         fileField: 'file',
         fileName: fileName,
         bytes: bytes,
+        fields: {'expected_pose': expectedPose},
         token: token,
       ),
+      FaceTemplateSummary.fromJson,
     );
   }
 
@@ -108,10 +132,4 @@ ApiResult<List<T>> _mapList<T>(
   return const ApiError(
     ApiFailure(statusCode: 0, operatorMessage: 'Invalid server response.'),
   );
-}
-
-ApiResult<Object?> _mapRaw(ApiResponse response) {
-  if (!response.isOk)
-    return ApiError(ApiFailure.fromStatus(response.statusCode, response.body));
-  return ApiSuccess(response.body);
 }

@@ -66,14 +66,47 @@ flutter analyze
 
 Checks Dart/Flutter code for static analysis issues.
 
+## 7. Live API Transport
+
+The app reads `env/mobile.json` at startup.
+
+Current mobile backend URL:
+
+```text
+http://192.168.1.13:8000/
+```
+
+Mobile LAN smoke command:
+
+```bash
+flutter run
+```
+
+Android release APK command:
+
+```bash
+flutter build apk --release
+```
+
+Local web smoke command after web platform files exist:
+
+```bash
+flutter run -d chrome
+```
+
+`-d chrome` selects the Chrome device target.
+`FACE_API_BASE_URL` passed through `--dart-define` overrides `env/mobile.json`.
+
 ## Current State
 
-- Current transport is demo-only: `lib/api/api_transport.dart`.
-- Platform run folders are not present yet.
-- Live HTTP transport is not implemented yet.
-- Camera/device integration is not implemented yet.
-- Android release setup is not documented yet.
-- Web run command is pending.
+- Demo transport remains available when no backend URL is configured: `lib/api/api_transport.dart`.
+- Live HTTP transport exists: `lib/api/live_api_transport.dart`, with multipart filename sanitization.
+- Capture opens one live camera session and uploads camera captures to `/v1/recognitions/identify`.
+- Enrollment creates a person, opens one live camera session, guides five prompts, and uploads samples with expected prompt metadata to `/v1/faces/{person_id}/samples`.
+- Flutter tests, analysis, and Android release APK build pass.
+- Android platform files are present.
+- Manual target-phone enrollment smoke is still unverified.
+- Web platform files are not present yet.
 
 ## References
 
@@ -85,3 +118,4 @@ Checks Dart/Flutter code for static analysis issues.
 | Dart dependency download | https://dart.dev/tools/pub/cmd/pub-get |
 | Current dependencies | [`pubspec.yaml`](pubspec.yaml) |
 | Current API transport | [`lib/api/api_transport.dart`](lib/api/api_transport.dart) |
+| Live API transport | [`lib/api/live_api_transport.dart`](lib/api/live_api_transport.dart) |

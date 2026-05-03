@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.schemas.validators import string_id
 
 
 class PersonCreate(BaseModel):
@@ -25,10 +27,11 @@ class PersonSummary(BaseModel):
     job_title: str | None = None
     access_status: str
 
+    _string_ids = field_validator("id", mode="before")(string_id)
+
 
 class PersonDetail(PersonSummary):
     employee_code: str | None = None
     extra_data: dict[str, Any]
     created_at: datetime
     updated_at: datetime
-

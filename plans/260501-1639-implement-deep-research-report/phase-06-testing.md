@@ -27,7 +27,7 @@ Add unit, integration, API, client, and environment smoke tests for the complete
 
 ## Requirements
 
-- Functional: tests for people CRUD, enrollment, identify, events, RBAC, upload validation, client result mapping.
+- Functional: tests for people CRUD, prompt-gated guided camera enrollment, live camera identify, events, RBAC, upload validation, client result mapping.
 - Non-functional: compile/type checks pass, tests can run locally with documented prerequisites.
 
 ## Architecture
@@ -39,7 +39,7 @@ Test layers:
 | Unit | services, threshold logic, upload validation, schema shaping |
 | Integration | database schema, repositories, API + DB |
 | Smoke | model load, `/server/info`, end-to-end sample flow |
-| Client | screen states, API client, auth guards |
+| Client | screen states, guided enrollment states, live identify states, API client, auth guards |
 | Security | RBAC, upload rejection, data minimization |
 
 ## Related Code Files
@@ -55,26 +55,36 @@ Test layers:
 3. Add API tests for auth, RBAC, people, enrollment upload errors, identify errors, and events filters.
 4. Add deterministic recognition tests with controlled embeddings.
 5. Add opt-in smoke test for real InsightFace model loading and provider reporting.
-6. Add Flutter widget tests for login, capture states, result states, enrollment progress, and role guards.
-7. Add one documented end-to-end demo command using real server, database, and client API calls.
-8. Run compile/type/test commands and fix failures.
+6. Add Flutter widget tests for login, live capture states, result states, guided enrollment prompt/progress states, and role guards.
+7. Add client tests for automatic enrollment sample capture, backend-gated advancement, and retry states.
+8. Add backend/API tests for enrollment wrong-pose rejection and stable prompt feedback codes.
+9. Add one documented end-to-end demo command using real server, database, and client API calls.
+10. Run compile/type/test commands and fix failures.
 
 ## Todo List
 
 - [x] Backend unit tests pass.
-- [ ] Database/API integration tests pass.
+- [x] Database/API integration tests pass.
 - [x] Recognition failure-path tests pass.
-- [x] Client widget tests pass.
-- [ ] GPU/model smoke test documented.
+- [x] Client widget/state/live transport tests pass; client analyze passes.
+- [x] GPU/model smoke test documented.
+- [x] Guided enrollment prompt/progress tests pass.
+- [x] Automatic enrollment sample capture tests pass.
+- [x] Live identify camera flow tests pass.
+- [x] Backend-gated enrollment advancement tests pass.
+- [x] Wrong-pose enrollment rejection tests pass.
 - [ ] End-to-end demo command exists.
 
 ## Success Criteria
 
-- [ ] All non-hardware-gated tests pass locally.
-- [ ] Hardware-gated smoke test can be run manually on NVIDIA host.
-- [ ] No syntax/compile errors in backend or client.
-- [ ] Tests cover `NO_FACE`, `MULTIPLE_FACES`, `LOW_SCORE`, invalid upload, unauthorized access, and admin-only data.
-- [ ] Test data contains no real biometric assets unless explicitly documented as local-only fixtures.
+- [x] All non-hardware-gated tests pass locally.
+  - [ ] Hardware-gated smoke test can be run manually on NVIDIA host.
+- [x] No syntax/compile errors in backend or client.
+- [x] Tests cover `NO_FACE`, `MULTIPLE_FACES`, `LOW_SCORE`, invalid upload, unauthorized access, and admin-only data.
+- [x] Tests cover guided enrollment prompt order, retry state, and completion state.
+- [x] Tests cover live identify camera session start, capture, submit, and result states.
+- [x] Tests cover enrollment staying on the same prompt after backend rejection.
+- [x] Test data contains no real biometric assets.
 
 ## Risk Assessment
 

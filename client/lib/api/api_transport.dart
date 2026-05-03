@@ -107,6 +107,15 @@ class DemoApiTransport implements ApiTransport {
     String? token,
   }) async {
     return switch (path) {
+      '/v1/people' => const ApiResponse(
+          statusCode: 201,
+          body: {
+            'id': 'p-1002',
+            'display_name': 'New Person',
+            'access_status': 'active',
+            'extra_data': <String, Object?>{},
+          },
+        ),
       _ => const ApiResponse(statusCode: 404, body: {'code': 'not_found'}),
     };
   }
@@ -120,7 +129,20 @@ class DemoApiTransport implements ApiTransport {
     Map<String, String> fields = const {},
     String? token,
   }) async {
-    if (path == '/v1/recognitions/identify' || path.contains('/v1/faces/')) {
+    if (path.contains('/v1/faces/')) {
+      return const ApiResponse(
+        statusCode: 200,
+        body: {
+          'id': 'template-demo',
+          'person_id': 'p-1002',
+          'model_pack': 'buffalo_m',
+          'model_version': 'demo',
+          'is_active': true,
+          'quality_score': 0.87,
+        },
+      );
+    }
+    if (path == '/v1/recognitions/identify') {
       return const ApiResponse(
         statusCode: 200,
         body: {

@@ -10,7 +10,8 @@ def test_health_route_returns_stable_payload():
 
 
 def test_info_route_reports_unloaded_model_without_gpu_dependency():
-    response = info(FaceModelLoader("buffalo_m"))
+    response = info(FaceModelLoader("buffalo_m"), template_count=3)
 
     assert response.model.model_pack == "buffalo_m"
     assert response.model.loaded is False
+    assert response.active_template_count == 3

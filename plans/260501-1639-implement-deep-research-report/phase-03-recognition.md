@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Recognition"
-status: in-progress
+status: complete
 priority: P1
 effort: "4d"
 dependencies: [1, 2]
@@ -17,7 +17,7 @@ dependencies: [1, 2]
 
 ## Overview
 
-Implement the server-side recognition engine: model loading, GPU provider selection, image validation, face count checks, embedding extraction, quality checks, similarity scoring, and threshold-based decisions.
+Implement the server-side recognition engine: model loading, GPU provider selection, image validation, face count checks, embedding extraction, quality checks, prompt-pose acceptance, similarity scoring, and threshold-based decisions.
 
 ## Key Insights
 
@@ -27,7 +27,7 @@ Implement the server-side recognition engine: model loading, GPU provider select
 
 ## Requirements
 
-- Functional: detect one face, reject invalid face counts, extract embeddings, enroll templates, identify top match, create decision result.
+- Functional: detect one face, reject invalid face counts, extract embeddings, enroll templates, validate enrollment prompt compliance, identify top match, create decision result.
 - Non-functional: GPU-first with CPU fallback warning, predictable memory use, stable error codes.
 
 ## Architecture
@@ -35,7 +35,7 @@ Implement the server-side recognition engine: model loading, GPU provider select
 Recognition service API:
 
 ```text
-EnrollmentService.upload_sample(person_id, image) -> FaceTemplate
+EnrollmentService.upload_sample(person_id, image, expected_pose) -> FaceTemplate
 RecognitionService.identify(image, device_id, save_probe) -> RecognitionResult
 ```
 
@@ -45,11 +45,12 @@ Pipeline:
 2. Decode image safely.
 3. Detect faces with InsightFace.
 4. Reject `NO_FACE`, `MULTIPLE_FACES`, or `LOW_QUALITY`.
-5. Extract normalized embedding.
-6. Query nearest active templates.
-7. Convert distance to similarity.
-8. Compare threshold and return `ALLOW`, `DENY`, or `REVIEW`.
-9. Persist event through repository.
+5. For enrollment, reject samples that do not match the current prompt target.
+6. Extract normalized embedding.
+7. Query nearest active templates.
+8. Convert distance to similarity.
+9. Compare threshold and return `ALLOW`, `DENY`, or `REVIEW`.
+10. Persist event through repository.
 
 ## Related Code Files
 
@@ -70,6 +71,8 @@ Pipeline:
 7. Implement threshold decision logic and person summary shaping.
 8. Add optional local storage for enrollment source images and short-lived probe images.
 9. Add unit tests with deterministic service boundaries; reserve real model smoke test for environment-enabled test.
+10. Add server-side enrollment prompt gates for front, left, right, up/down, and natural prompts.
+11. Return operator-safe prompt feedback when the sample has no face, multiple faces, low quality, or wrong pose.
 
 ## Todo List
 
@@ -78,15 +81,19 @@ Pipeline:
 - [x] Enrollment service creates templates.
 - [x] Identify service returns stable result shape.
 - [x] Event logging path integrated.
-- [ ] Real GPU smoke test documented.
+- [x] Real GPU smoke test documented.
+- [x] Enrollment prompt-pose validation implemented server-side.
+- [x] Enrollment sample rejection returns prompt feedback before template creation.
 
 ## Success Criteria
 
-- [ ] One good enrollment image creates a template; enrollment workflow can enforce 3-5 samples at API/client layer.
-- [ ] No face, multiple faces, invalid upload, and low score return explicit failure reasons.
-- [ ] Match result includes `person_id`, `face_template_id`, `similarity_score`, and `threshold`.
+- [x] One good enrollment image creates a template; enrollment workflow can enforce 3-5 samples at API/client layer.
+- [x] No face, multiple faces, invalid upload, and low score return explicit failure reasons.
+- [x] Match result includes `person_id`, `face_template_id`, `similarity_score`, and `threshold`.
 - [x] `/v1/server/info` can report providers and model status from this service.
-- [ ] CPU fallback is visible, not silent.
+- [x] CPU fallback is visible, not silent.
+- [x] Enrollment only accepts a prompted sample when the server validates the expected pose/quality.
+- [x] Wrong-pose enrollment samples return an operator-safe rejection reason.
 
 ## Risk Assessment
 

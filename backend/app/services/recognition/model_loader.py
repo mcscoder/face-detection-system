@@ -1,7 +1,8 @@
 import logging
+from pathlib import Path
 from typing import Any
 
-from app.services.recognition.types import ExtractedFace, ModelStatus
+from app.services.recognition.types import ExtractedFace, FacePose, ModelStatus
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +29,16 @@ class FaceModelLoader:
         try:
             from insightface.app import FaceAnalysis
         except ImportError as exc:
-            raise RuntimeError("Install backend gpu extras before loading model.") from exc
+            raise RuntimeError("Run uv sync before loading model.") from exc
 
         providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
         try:
-            model = FaceAnalysis(name=self.model_pack, providers=providers)
+            model = _create_face_analysis(FaceAnalysis, self.model_pack, providers)
             model.prepare(ctx_id=0, det_size=(640, 640))
             self._providers = providers
         except Exception as exc:
             logger.warning("CUDA model load failed, falling back to CPU: %s", exc)
-            model = FaceAnalysis(name=self.model_pack, providers=["CPUExecutionProvider"])
+            model = _create_face_analysis(FaceAnalysis, self.model_pack, ["CPUExecutionProvider"])
             model.prepare(ctx_id=-1, det_size=(640, 640))
             self._providers = ["CPUExecutionProvider"]
             self._warning = "CUDA unavailable; using CPUExecutionProvider"
@@ -56,7 +57,11 @@ class FaceModelLoader:
         quality_score = _quality_score(face)
         if quality_score < 0.2:
             raise ValueError("LOW_QUALITY")
-        return ExtractedFace(embedding=embedding, quality_score=quality_score)
+        return ExtractedFace(
+            embedding=embedding,
+            quality_score=quality_score,
+            pose=_face_pose(face),
+        )
 
 
 def _decode_image(image_bytes: bytes) -> Any:
@@ -64,7 +69,7 @@ def _decode_image(image_bytes: bytes) -> Any:
         import cv2
         import numpy as np
     except ImportError as exc:
-        raise RuntimeError("Install backend gpu extras before image decoding.") from exc
+        raise RuntimeError("Run uv sync before image decoding.") from exc
     raw = np.frombuffer(image_bytes, dtype=np.uint8)
     image = cv2.imdecode(raw, cv2.IMREAD_COLOR)
     if image is None:
@@ -72,7 +77,38 @@ def _decode_image(image_bytes: bytes) -> Any:
     return image
 
 
+def _create_face_analysis(face_analysis: Any, model_pack: str, providers: list[str]) -> Any:
+    try:
+        return face_analysis(name=model_pack, providers=providers)
+    except AssertionError:
+        if _repair_nested_model_pack(model_pack):
+            return face_analysis(name=model_pack, providers=providers)
+        raise
+
+
+def _repair_nested_model_pack(model_pack: str, root: Path | None = None) -> bool:
+    model_dir = (root or Path.home() / ".insightface") / "models" / model_pack
+    if any(model_dir.glob("*.onnx")):
+        return False
+    nested_dir = model_dir / model_pack
+    if not nested_dir.is_dir():
+        return False
+    moved = False
+    for source in nested_dir.glob("*.onnx"):
+        target = model_dir / source.name
+        if not target.exists():
+            source.replace(target)
+            moved = True
+    return moved
+
+
 def _quality_score(face: Any) -> float:
     detection_score = float(getattr(face, "det_score", 0.0))
     return max(0.0, min(1.0, detection_score))
 
+
+def _face_pose(face: Any) -> FacePose | None:
+    pose = getattr(face, "pose", None)
+    if pose is None or len(pose) < 3:
+        return None
+    return FacePose(pitch=float(pose[0]), yaw=float(pose[1]), roll=float(pose[2]))

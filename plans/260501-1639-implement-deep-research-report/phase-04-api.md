@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "API"
-status: in-progress
+status: complete
 priority: P1
 effort: "4d"
 dependencies: [1, 2, 3]
@@ -17,7 +17,7 @@ dependencies: [1, 2, 3]
 
 ## Overview
 
-Expose the v1 HTTP API for auth, people, enrollment, recognition, events, server info, and config. Enforce role-based access and stable response contracts.
+Expose the v1 HTTP API for auth, people, prompt-gated enrollment, live-camera recognition, events, server info, and config. Enforce role-based access and stable response contracts.
 
 ## Key Insights
 
@@ -27,7 +27,7 @@ Expose the v1 HTTP API for auth, people, enrollment, recognition, events, server
 
 ## Requirements
 
-- Functional: JWT login, RBAC, CRUD people, face enrollment, recognition identify, events query, health/info/config.
+- Functional: JWT login, RBAC, CRUD people, prompt-gated face enrollment, recognition identify, events query, health/info/config.
 - Non-functional: OpenAPI docs accurate, stable error codes, no stack trace leakage, CORS allowlist.
 
 ## Architecture
@@ -58,11 +58,12 @@ Response models must hide fields by role.
 1. Implement password login and JWT issuing for local users.
 2. Add dependencies for current user, required role, registered device, and request context.
 3. Build people CRUD/search routes with JSONB metadata support.
-4. Build enrollment routes: upload face sample, list templates, disable template, re-enroll placeholder if model changes.
+4. Build enrollment routes: upload face sample with expected prompt target, list templates, disable template, re-enroll placeholder if model changes.
 5. Build recognition route `POST /v1/recognitions/identify` with upload validation and event result.
 6. Build event query routes with date/person/device filters and role-aware fields.
 7. Build config routes for threshold, retention, CORS/device-readable settings.
 8. Add API tests for status codes, RBAC, upload failure paths, and response schemas.
+9. Add API contract support for enrollment prompt metadata and wrong-pose/quality feedback.
 
 ## Todo List
 
@@ -71,15 +72,18 @@ Response models must hide fields by role.
 - [x] Enrollment endpoints implemented.
 - [x] Recognition endpoint implemented.
 - [x] Event/config endpoints implemented.
-- [ ] API tests cover happy and failure paths.
+- [x] API tests cover happy and failure paths.
+- [x] Enrollment sample API accepts expected prompt target metadata.
+- [x] Enrollment sample API returns stable prompt feedback for wrong-pose rejection.
 
 ## Success Criteria
 
 - [x] OpenAPI shows all v1 routes with typed request/response models.
-- [ ] Operator can identify but cannot view full admin-only template data.
-- [ ] Admin can manage people, templates, threshold, and event search.
-- [ ] Recognition endpoint returns exact contract required by the report.
-- [ ] Upload errors return stable codes: `INVALID_IMAGE`, `NO_FACE`, `MULTIPLE_FACES`, `LOW_QUALITY`, `LOW_SCORE`.
+- [x] Operator can identify but cannot view full admin-only template data.
+- [x] Admin can manage people, templates, threshold, and event search.
+- [x] Recognition endpoint returns exact contract required by the report.
+- [x] Upload errors return stable codes: `INVALID_IMAGE`, `NO_FACE`, `MULTIPLE_FACES`, `LOW_QUALITY`, `LOW_SCORE`.
+- [x] Enrollment prompt errors return stable codes including wrong pose or prompt mismatch.
 
 ## Risk Assessment
 

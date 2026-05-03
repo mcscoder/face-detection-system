@@ -76,20 +76,86 @@ class AppController extends ValueNotifier<AppState> {
     if (value.isLoggedIn) await refreshAdminData();
   }
 
-  Future<void> identifyDemoImage() async {
+  Future<void> identifyImage({
+    required String fileName,
+    required List<int> bytes,
+  }) async {
     final token = value.session?.token;
     if (token == null) return;
     value = value.copyWith(isBusy: true, clearMessage: true);
     final result = await _api.identify(
       token: token,
-      fileName: 'demo-capture.jpg',
-      bytes: const [1, 2, 3],
+      fileName: fileName,
+      bytes: bytes,
     );
     value = result.when(
       ok: (recognition) =>
           value.copyWith(lastResult: recognition, isBusy: false),
       error: (failure) =>
           value.copyWith(isBusy: false, message: failure.operatorMessage),
+    );
+  }
+
+  Future<PersonSummary?> createPerson({
+    required String displayName,
+    String? employeeCode,
+    String? jobTitle,
+  }) async {
+    final token = value.session?.token;
+    if (token == null) return null;
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.createPerson(
+      token: token,
+      displayName: displayName,
+      employeeCode: employeeCode,
+      jobTitle: jobTitle,
+    );
+    return result.when(
+      ok: (person) {
+        value = value.copyWith(
+          people: [...value.people, person],
+          isBusy: false,
+        );
+        return person;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
+    );
+  }
+
+  Future<FaceTemplateSummary?> uploadEnrollmentSample({
+    required String personId,
+    required String fileName,
+    required List<int> bytes,
+    required String expectedPose,
+  }) async {
+    final token = value.session?.token;
+    if (token == null) return null;
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.uploadEnrollmentSample(
+      token: token,
+      personId: personId,
+      fileName: fileName,
+      bytes: bytes,
+      expectedPose: expectedPose,
+    );
+    return result.when(
+      ok: (template) {
+        value = value.copyWith(isBusy: false);
+        return template;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
     );
   }
 
@@ -112,5 +178,9 @@ class AppController extends ValueNotifier<AppState> {
 
   void logout() {
     value = const AppState();
+  }
+
+  void showMessage(String message) {
+    value = value.copyWith(isBusy: false, message: message);
   }
 }

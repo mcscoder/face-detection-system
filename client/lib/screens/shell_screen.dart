@@ -30,7 +30,10 @@ class _ShellScreenState extends State<ShellScreen> {
           return LoginScreen(controller: widget.controller);
         final screens = [
           CaptureScreen(controller: widget.controller),
-          PeopleScreen(controller: widget.controller),
+          PeopleScreen(
+            controller: widget.controller,
+            onAddPerson: () => setState(() => index = 2),
+          ),
           EnrollmentScreen(controller: widget.controller),
           EventsScreen(controller: widget.controller),
           SettingsScreen(controller: widget.controller),

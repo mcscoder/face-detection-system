@@ -25,6 +25,22 @@ void main() {
     );
   });
 
+  test('maps network errors to server unavailable message', () async {
+    final client = ApiClient(
+      _FailingTransport(
+        const ApiResponse(statusCode: 0, body: {'detail': 'NETWORK_ERROR'}),
+      ),
+    );
+
+    final result = await client.serverInfo();
+
+    expect(result, isA<ApiError>());
+    expect(
+      (result as ApiError).failure.operatorMessage,
+      'Server unavailable.',
+    );
+  });
+
   test('maps recognition decisions from server text', () async {
     final client = ApiClient(_IdentifyTransport());
 
@@ -38,6 +54,28 @@ void main() {
     final recognition = (result as ApiSuccess<RecognitionResult>).value;
     expect(recognition.decision, RecognitionDecision.noFace);
     expect(recognition.eventId, 'evt-1');
+  });
+
+  test('maps enrollment prompt rejection to retry guidance', () async {
+    final client = ApiClient(
+      _FailingTransport(
+        const ApiResponse(statusCode: 400, body: {'detail': 'WRONG_POSE'}),
+      ),
+    );
+
+    final result = await client.uploadEnrollmentSample(
+      token: 'token',
+      personId: 'person-1',
+      fileName: 'sample.jpg',
+      bytes: const [1],
+      expectedPose: 'turn_left',
+    );
+
+    expect(result, isA<ApiError<FaceTemplateSummary>>());
+    expect(
+      (result as ApiError<FaceTemplateSummary>).failure.operatorMessage,
+      'Follow the current face prompt.',
+    );
   });
 }
 

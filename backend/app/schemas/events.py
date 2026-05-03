@@ -1,6 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+from app.schemas.validators import string_id
 
 
 class RecognitionEventResponse(BaseModel):
@@ -15,3 +17,9 @@ class RecognitionEventResponse(BaseModel):
     failure_reason: str | None = None
     created_at: datetime
 
+    _string_ids = field_validator(
+        "id",
+        "person_id",
+        "face_template_id",
+        mode="before",
+    )(string_id)

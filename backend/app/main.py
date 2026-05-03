@@ -24,8 +24,11 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(api_router, prefix="/v1")
+    if settings.preload_model:
+        from app.api.dependencies import model_loader
+
+        model_loader(settings).load()
     return app
 
 
 app = create_app()
-

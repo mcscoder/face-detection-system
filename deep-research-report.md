@@ -8,6 +8,12 @@ Về bản chất nghiệp vụ, use case chính ở đây là **face identifica
 
 Mục tiêu sản phẩm của bản PRD này là tạo ra một hệ thống v1 phục vụ demo và đánh giá kỹ thuật, với các đặc tính sau: chạy hoàn toàn cục bộ, không phụ thuộc cloud; cho phép quản lý hồ sơ người dùng với số lượng trường thông tin linh hoạt; nhận diện khuôn mặt để quyết định cho phép/không cho phép ra vào; và trả về một khóa định danh ổn định để truy hồi hồ sơ từ database. Đồng thời, vì đây là dữ liệu sinh trắc học, sản phẩm phải coi dữ liệu khuôn mặt là dữ liệu nhạy cảm, áp dụng tối thiểu hóa dữ liệu, mã hóa, giới hạn lưu giữ và phân quyền truy cập rõ ràng. Theo Ủy ban châu Âu, dữ liệu sinh trắc học dùng để định danh con người là dữ liệu nhạy cảm; ICO cũng nhấn mạnh yêu cầu bảo mật cao hơn, mã hóa và chỉ lưu dữ liệu trong thời gian cần thiết.
 
+### Trạng thái triển khai hiện tại
+
+Trạng thái hiện tại của dự án đã lệch khỏi bản kế hoạch ban đầu ở phần trải nghiệm client và hợp đồng API enrollment. Mobile app hiện đã có **live-camera identify** và **guided live-camera enrollment**. Enrollment không còn là luồng upload 3-5 ảnh rời rạc; app mở một phiên camera, đi qua **5 prompt cố định** gồm nhìn thẳng, quay trái, quay phải, nhìn lên/xuống và diện mạo tự nhiên. Mỗi sample enrollment gửi lên server kèm `expected_pose`, và server chỉ cho bước tiếp theo khi ảnh có đúng một khuôn mặt, đủ chất lượng và đúng pose mong đợi.
+
+Phần đã xác minh hiện tại gồm backend tests pass, Flutter tests/analyze pass và Android release APK build pass. Phần còn mở gồm Flutter web platform folder, target-phone smoke thật, GPU/database smoke trên máy đích và full end-to-end enrollment -> identify audit trên phần cứng đích.
+
 ## Kiến trúc local-first và phân tách side
 
 Kiến trúc đề xuất là **single-host local server** chạy trên máy có GPU NVIDIA 8GB, đóng vai trò “edge server” trong mạng nội bộ. Máy này sẽ chạy Python API server, engine AI nhận diện khuôn mặt, PostgreSQL, extension pgvector để tìm kiếm vector, và vùng lưu trữ cục bộ cho ảnh gốc hoặc ảnh audit nếu bật. Các client Flutter trên điện thoại hoặc laptop sẽ gửi ảnh qua HTTP API đến server local qua LAN hoặc cùng máy. Điều quan trọng là **client không làm inference AI**; client chỉ chụp ảnh, gửi ảnh, nhận kết quả và hiển thị. Quyết định này giúp tận dụng GPU duy nhất ở server, tránh tình trạng mỗi client phải cài model và xử lý phụ thuộc phần cứng riêng. Nền tảng này cũng phù hợp với ONNX Runtime Execution Providers, nơi CUDAExecutionProvider được dùng để tận dụng GPU NVIDIA, còn CPUExecutionProvider làm fallback.
@@ -98,15 +104,19 @@ Server phải cho phép:
 - truy vấn hồ sơ theo `person_id`;
 - tìm kiếm theo tên, mã nhân sự, chức vụ hoặc metadata khác.
 
-Vì bạn muốn “thêm bao nhiêu field cũng được”, mô hình hợp lý nhất là hồ sơ có **một phần cột chuẩn** cho các trường thường dùng như `full_name`, `date_of_birth`, `gender`, `address`, `job_title`, và **một phần `extra_data JSONB`** cho các trường phát sinh. PostgreSQL khuyến nghị phần lớn ứng dụng nên dùng `jsonb` vì xử lý nhanh hơn và hỗ trợ indexing; GIN indexes cũng cho phép query hiệu quả trên tài liệu JSONB.
+Vì bạn muốn “thêm bao nhiêu field cũng được”, mô hình hiện tại dùng **một phần cột chuẩn tối thiểu** gồm `employee_code`, `display_name`, `job_title`, `access_status`, và **một phần `extra_data JSONB`** cho các trường phát sinh. PostgreSQL khuyến nghị phần lớn ứng dụng nên dùng `jsonb` vì xử lý nhanh hơn và hỗ trợ indexing; GIN indexes cũng cho phép query hiệu quả trên tài liệu JSONB.
 
 #### Enrollment khuôn mặt
 
 Enrollment là quy trình biến một người chưa có mẫu khuôn mặt thành một người có thể được nhận diện. PRD v1 nên quy định:
 
-- Mỗi người phải có từ **3 đến 5 ảnh enrollment** ở các góc và điều kiện hơi khác nhau.
+- Mỗi người đi qua **5 sample enrollment** trong một phiên camera live.
+- 5 prompt enrollment hiện tại là: nhìn thẳng, quay trái, quay phải, nhìn lên/xuống, và diện mạo tự nhiên.
 - Server chỉ chấp nhận ảnh có **đúng một khuôn mặt**.
 - Ảnh enrollment phải đạt quality check tối thiểu.
+- Client gửi `expected_pose` theo prompt hiện tại; server reject sample sai pose bằng lỗi ổn định như `WRONG_POSE`.
+- Client chỉ chuyển sang prompt kế tiếp sau khi server accept sample hiện tại.
+- Khi sample bị reject vì `NO_FACE`, `MULTIPLE_FACES`, `LOW_QUALITY` hoặc `WRONG_POSE`, client giữ nguyên prompt và retry trong cùng phiên camera.
 - Sau khi quality check đạt, server sinh ra **1 hoặc nhiều face template** và lưu vào bảng embeddings.
 - Một người có thể có nhiều template active.
 
@@ -188,7 +198,8 @@ Các tác vụ nhỏ như ghi log, dọn file, tạo thumbnail có thể dùng `
 Client không phải là nơi “nhận diện khuôn mặt”, mà là nơi **capture và orchestration UI**. Flutter client chịu trách nhiệm:
 - đăng nhập;
 - chọn camera;
-- chụp hoặc upload ảnh;
+- mở live camera preview;
+- chụp ảnh từ camera live;
 - gửi ảnh tới server;
 - hiển thị kết quả match / no match;
 - hiển thị card thông tin người được nhận diện;
@@ -203,7 +214,7 @@ PRD nên tách client thành hai mode, dù vẫn có thể nằm trong một cod
 #### Capture client
 
 Đây là màn hình vận hành chính cho bảo vệ hoặc người kiểm soát cửa:
-- mở camera;
+- mở một phiên live camera;
 - căn khung mặt;
 - chụp ảnh;
 - gửi tới `/v1/recognitions/identify`;
@@ -220,7 +231,7 @@ PRD nên tách client thành hai mode, dù vẫn có thể nằm trong một cod
 Đây là màn hình dành cho quản trị:
 - tạo hồ sơ người;
 - thêm trường dữ liệu;
-- enrollment khuôn mặt;
+- enrollment khuôn mặt bằng live camera guided flow;
 - xem danh sách template;
 - xem log nhận diện;
 - điều chỉnh threshold;
@@ -229,8 +240,9 @@ PRD nên tách client thành hai mode, dù vẫn có thể nằm trong một cod
 ### Yêu cầu UX chính của client
 
 Client v1 nên ưu tiên cảm giác “ít thao tác”:
-- với nhận diện: tối đa 2–3 bước;
-- với enrollment: wizard tuần tự, rõ số ảnh còn thiếu;
+- với nhận diện: mở live camera, bấm check face, xem kết quả;
+- với enrollment: một phiên live camera, 5 prompt tuần tự, rõ số sample còn thiếu;
+- với enrollment bị reject: hiển thị lý do dễ hiểu và retry cùng prompt, không tự nhảy bước;
 - với log: lọc theo ngày, theo người, theo device;
 - với lỗi: hiển thị thông báo dễ hiểu, không lộ stack trace hay lỗi nội bộ.
 
@@ -259,13 +271,10 @@ PRD đề xuất dữ liệu theo các bảng cốt lõi sau.
 | Trường | Kiểu | Mục đích |
 |---|---|---|
 | `id` | UUID | định danh chính |
-| `code` | text | mã nhân sự / mã nội bộ |
-| `full_name` | text | tên đầy đủ |
-| `date_of_birth` | date | ngày sinh |
-| `gender` | text | giới tính |
-| `address` | text | địa chỉ |
+| `employee_code` | text nullable | mã nhân sự / mã nội bộ |
+| `display_name` | text | tên hiển thị |
 | `job_title` | text | chức vụ |
-| `status` | text | active / blocked / deleted |
+| `access_status` | text | active / blocked / deleted |
 | `extra_data` | JSONB | trường linh hoạt do admin tự thêm |
 | `created_at` | timestamptz | audit |
 | `updated_at` | timestamptz | audit |
@@ -301,7 +310,7 @@ Thiết kế này vừa giữ được các cột phổ biến để query đơn
 | `person_id` | UUID nullable | người được match |
 | `face_template_id` | UUID nullable | template trúng |
 | `similarity_score` | numeric | điểm giống |
-| `threshold_used` | numeric | ngưỡng tại thời điểm đó |
+| `threshold` | numeric | ngưỡng tại thời điểm đó |
 | `decision` | text | ALLOW / DENY / REVIEW |
 | `failure_reason` | text nullable | NO_FACE / MULTIPLE_FACES / LOW_SCORE... |
 | `probe_image_path` | text nullable | chỉ nếu bật audit retention |
@@ -335,10 +344,9 @@ PRD đề xuất bộ API tối thiểu sau.
 
 | Method | Endpoint | Mục đích |
 |---|---|---|
-| `POST` | `/v1/people/{person_id}/faces` | upload ảnh enrollment, sinh template |
-| `GET` | `/v1/people/{person_id}/faces` | danh sách templates |
-| `DELETE` | `/v1/face-templates/{template_id}` | vô hiệu hóa / xóa template |
-| `POST` | `/v1/people/{person_id}/re-enroll` | tạo lại template theo model mới |
+| `POST` | `/v1/faces/{person_id}/samples` | upload sample enrollment kèm `expected_pose`, sinh template nếu server accept |
+| `GET` | `/v1/faces/{person_id}` | danh sách templates của một người |
+| `DELETE` | `/v1/faces/{template_id}` | vô hiệu hóa template |
 
 #### Nhận diện và log
 
@@ -354,10 +362,8 @@ PRD đề xuất bộ API tối thiểu sau.
 
 **Request**
 - `multipart/form-data`
-- `image`: file ảnh
-- `device_id`: text
-- `mode`: `identify`
-- `save_probe`: boolean tùy chọn
+- `file`: ảnh chụp từ live camera
+- `device_id`: query parameter tùy chọn
 
 **Response đề xuất**
 
@@ -371,14 +377,29 @@ PRD đề xuất bộ API tối thiểu sau.
   "similarity_score": 0.7814,
   "threshold": 0.6200,
   "person_summary": {
-    "full_name": "Nguyen Van A",
+    "id": "18fe91f7-df1a-4d7f-ae30-c4f8c70f32a2",
+    "display_name": "Nguyen Van A",
     "job_title": "Engineer",
-    "status": "active"
+    "access_status": "active"
   }
 }
 ```
 
 Thiết kế response này thỏa đúng mong muốn của bạn: sau khi nhận diện thành công, hệ thống trả về **một ID ổn định** để truy hồi toàn bộ thông tin từ database; đồng thời trả thêm một “trọng số” ở dạng `similarity_score` để phục vụ giải thích hệ thống, log và tuning threshold. Theo cách hiểu nghiệp vụ lẫn hướng dẫn biometric recognition, đây là mô hình phản hồi đúng đắn hơn nhiều so với chỉ trả “true/false”.
+
+`POST /v1/faces/{person_id}/samples`
+
+**Request**
+- `multipart/form-data`
+- `file`: ảnh chụp từ guided live camera
+- `expected_pose`: `face_forward`, `turn_left`, `turn_right`, `look_up_down`, hoặc `natural`
+
+**Failure codes ổn định**
+- `NO_FACE`
+- `MULTIPLE_FACES`
+- `LOW_QUALITY`
+- `WRONG_POSE`
+- `INVALID_PROMPT`
 
 ### Chiến lược truy vấn vector
 
@@ -421,19 +442,19 @@ PRD v1 cho local deployment nên định nghĩa rõ:
 
 ### Tiêu chí nghiệm thu của đồ án
 
-Hệ thống được coi là đạt v1 nếu thỏa các tiêu chí sau:
+Trạng thái hiện tại của dự án so với tiêu chí v1:
 
-- Chạy hoàn toàn trên **một máy local** có **NVIDIA GPU 8GB**.
-- Python server khởi động được, load model thành công trên CUDA provider.
-- Flutter mobile client gọi được API nhận diện qua LAN.
-- Flutter web client chạy được trên `localhost`; nếu chạy qua LAN IP thì có HTTPS local.
-- Có thể tạo hồ sơ người với cả field chuẩn và field mở rộng.
-- Có thể enrollment ít nhất 3 ảnh cho một người và sinh template thành công.
-- Khi đưa ảnh của người đã đăng ký, server trả về `person_id` và `similarity_score`.
-- Khi đưa ảnh người chưa đăng ký, server trả về `matched = false`.
-- Tất cả lần nhận diện đều được ghi vào `recognition_events`.
-- Chỉ Admin xem được đầy đủ profile và danh sách templates.
-- Có file hoặc script backup dữ liệu local.
+- Đã có FastAPI backend, auth/RBAC, people CRUD, enrollment API, recognition API, events/config routes.
+- Đã có Flutter mobile app dùng live-camera identify qua `/v1/recognitions/identify`.
+- Đã có guided live-camera enrollment 5 prompt qua `/v1/faces/{person_id}/samples`.
+- Đã có server-side prompt validation bằng `expected_pose`.
+- Đã có PostgreSQL + pgvector schema và repository path.
+- Đã có backend tests pass, Flutter tests/analyze pass, Android release APK build pass.
+- Chưa xác minh target-phone smoke thật.
+- Chưa xác minh PostgreSQL + pgvector setup trên máy đích.
+- Chưa xác minh InsightFace/ONNX Runtime GPU smoke trên máy NVIDIA đích.
+- Chưa có Flutter web platform folder.
+- Chưa xác minh full end-to-end enrollment -> identify audit trên phần cứng đích.
 
 ### Kết luận định hướng triển khai
 

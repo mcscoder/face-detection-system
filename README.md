@@ -4,11 +4,12 @@ Local-first face recognition access-control system, planned for one machine with
 
 ## Current Status
 
-- Repository state: backend foundation in progress
-- Implementation state: FastAPI backend scaffold, schema, service contracts, and tests added
+- Repository state: backend foundation in progress, Flutter client mobile guided enrollment and live identify implemented
+- Implementation state: FastAPI backend foundation, schema, service contracts, prompt-gated enrollment, and tests added; Flutter client live guided enrollment, live identify capture, and live transport are implemented
+- Verified state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Existing product source: [`deep-research-report.md`](./deep-research-report.md)
 - Current backend code: [`backend/`](./backend)
-- Current client code: Flutter shell in [`client/`](./client)
+- Current client code: Flutter shell in [`client/`](./client) with guided camera enrollment, live camera identify capture, and live transport
 - Current database code: PostgreSQL schema file added
 
 ## Target Product
@@ -22,7 +23,7 @@ Local-first face recognition access-control system, planned for one machine with
 
 ## Core Flow
 
-1. Enroll a person with 3-5 face images
+1. Enroll a person with guided live-camera samples
 2. Generate face templates on the server
 3. Identify a probe image with 1:N matching
 4. Return `person_id`, `similarity_score`, `threshold`, `event_id`, and `decision`
@@ -41,22 +42,25 @@ Local-first face recognition access-control system, planned for one machine with
 ## What Is Implemented
 
 - FastAPI app factory with `/v1/server/health` and `/v1/server/info`
+- `/v1/server/info` exposes `active_template_count` only to authenticated admin/operator/enrollment users, and excludes deleted people from the count
+- People list supports `metadata_key` and `metadata_value` filters while keeping the person detail response contract
 - `uv` backend package management with `backend/uv.lock`
 - PostgreSQL + pgvector schema file
 - Auth/RBAC helpers, API route contracts, repositories, and Pydantic schemas
+- First admin creation command that requires `FACE_ADMIN_PASSWORD`
 - Recognition upload validation, decision logic, model loader boundary, enrollment/identify services
 - Direct PostgreSQL schema setup path
-- Backend unit/API tests for deterministic behavior
-- Flutter client shell, demo transport, operational screens, and tests
+- Backend unit/API tests for deterministic behavior, plus opt-in database and GPU smoke tests
+- Flutter client shell, demo/live transports, Android live-camera identify capture, prompt-gated guided live-camera enrollment, operational screens, and tests
+- Live transport sanitizes multipart filenames
 
-## What Is Not Built Yet
+## What Is Not Yet Complete
 
-- Full Flutter camera/device integration
-- Real InsightFace/GPU smoke run
-- Admin seed command
-- Production admin UI completeness
-- End-to-end enrollment -> identify demo on target hardware
-- Client platform run folders
+- Not verified: Manual target-phone enrollment smoke
+- Not verified: Target-host database and InsightFace/GPU smoke runs
+- Not built: Production admin UI completeness
+- Not verified: Full end-to-end enrollment -> identify audit on target hardware
+- Not built: Flutter web platform run folder
 
 ## Setup Guides
 

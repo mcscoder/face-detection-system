@@ -29,9 +29,9 @@ No unfinished project or global plans found during scan. This plan has no detect
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | [Foundation](./phase-01-foundation.md) | Complete |
-| 2 | [Database](./phase-02-database.md) | In Progress |
-| 3 | [Recognition](./phase-03-recognition.md) | In Progress |
-| 4 | [API](./phase-04-api.md) | In Progress |
+| 2 | [Database](./phase-02-database.md) | Complete |
+| 3 | [Recognition](./phase-03-recognition.md) | Complete |
+| 4 | [API](./phase-04-api.md) | Complete |
 | 5 | [Client](./phase-05-client.md) | In Progress |
 | 6 | [Testing](./phase-06-testing.md) | In Progress |
 | 7 | [Deployment](./phase-07-deployment.md) | In Progress |
@@ -63,12 +63,12 @@ After Phase 1, Phase 2 and the client shell portions of Phase 5 can run in paral
 
 - FastAPI server starts locally through the backend setup guide and reports model/GPU status.
 - PostgreSQL stores people, templates, events, config, and JSONB metadata.
-- Enrollment accepts 3-5 images and creates active face templates.
+- Enrollment uses a guided live-camera flow that advances only after server validation confirms face presence, single face, quality, and expected prompt pose.
 - Recognition returns `event_id`, `matched`, `decision`, `person_id`, `similarity_score`, `threshold`, and minimal person summary.
-- Flutter mobile can capture/upload over LAN; Flutter web works on localhost.
+- Flutter mobile can guide enrollment and live-camera recognition capture over LAN; Flutter web works on localhost.
 - Admin-only fields and template/debug data are RBAC protected.
 - Recognition events are audited and probe image retention is explicit.
-- Tests cover services, API/database paths, and recognition failure states.
+- Tests cover services, API/database paths, recognition failure states, live identify flow, and prompt-gated enrollment states.
 
 ## Unresolved Questions
 

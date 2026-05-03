@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Database"
-status: in-progress
+status: complete
 priority: P1
 effort: "3d"
 dependencies: [1]
@@ -67,16 +67,16 @@ Core tables:
 - [x] pgvector extension enabled in schema.
 - [x] Repository layer isolates SQL.
 - [x] Seed roles/config available in schema.
-- [ ] First admin creation command available without a default password.
-- [ ] Database integration tests added.
+- [x] First admin creation command available without a default password.
+- [x] Database integration tests added; local run requires `FACE_TEST_DATABASE_URL`.
 
 ## Success Criteria
 
-- [ ] Fresh database can apply current schema on local PostgreSQL.
-- [ ] `people.extra_data` stores and queries flexible metadata.
-- [ ] `face_templates` can store active/inactive embeddings with model metadata.
-- [ ] `recognition_events` supports matched and failed outcomes.
-- [ ] Common query paths have indexes.
+- [x] Fresh database can apply current schema on local PostgreSQL; user reported backend setup complete.
+- [x] `people.extra_data` stores and queries flexible metadata.
+- [x] `face_templates` can store active/inactive embeddings with model metadata.
+- [x] `recognition_events` supports matched and failed outcomes.
+- [x] Common query paths have indexes.
 
 ## Risk Assessment
 

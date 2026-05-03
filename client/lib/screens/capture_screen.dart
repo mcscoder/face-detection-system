@@ -1,51 +1,117 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/domain.dart';
+import '../services/enrollment_camera_session.dart';
 import '../state/app_controller.dart';
+import '../widgets/capture_camera_stage.dart';
 import '../widgets/status_banner.dart';
 import 'result_screen.dart';
 
-class CaptureScreen extends StatelessWidget {
-  const CaptureScreen({super.key, required this.controller});
+class CaptureScreen extends StatefulWidget {
+  const CaptureScreen({
+    super.key,
+    required this.controller,
+    this.cameraSession,
+  });
 
   final AppController controller;
+  final EnrollmentCameraSession? cameraSession;
+
+  @override
+  State<CaptureScreen> createState() => _CaptureScreenState();
+}
+
+enum _CaptureRunState { startingCamera, idle, capturing }
+
+class _CaptureScreenState extends State<CaptureScreen> {
+  late final EnrollmentCameraSession _cameraSession =
+      widget.cameraSession ?? LiveEnrollmentCameraSession();
+  _CaptureRunState runState = _CaptureRunState.startingCamera;
+  String? statusText;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_startCamera());
+  }
+
+  @override
+  void dispose() {
+    unawaited(_cameraSession.dispose());
+    super.dispose();
+  }
+
+  Future<void> _startCamera() async {
+    if (_cameraSession.isReady) {
+      setState(() => runState = _CaptureRunState.idle);
+      return;
+    }
+    setState(() {
+      runState = _CaptureRunState.startingCamera;
+      statusText = 'Starting camera.';
+    });
+    try {
+      await _cameraSession.initialize();
+      if (!mounted) return;
+      setState(() {
+        runState = _CaptureRunState.idle;
+        statusText = 'Camera ready.';
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        runState = _CaptureRunState.idle;
+        statusText = 'Camera unavailable.';
+      });
+    }
+  }
+
+  Future<void> _identifyFromCamera() async {
+    if (!_cameraSession.isReady) await _startCamera();
+    if (!mounted || !_cameraSession.isReady) return;
+    setState(() {
+      runState = _CaptureRunState.capturing;
+      statusText = 'Checking face.';
+    });
+    try {
+      final capture = await _cameraSession.capture();
+      if (!mounted) return;
+      await widget.controller.identifyImage(
+        fileName: capture.fileName,
+        bytes: capture.bytes,
+      );
+      if (!mounted) return;
+      setState(() {
+        runState = _CaptureRunState.idle;
+        statusText = 'Capture checked.';
+      });
+    } catch (_) {
+      if (mounted) {
+        widget.controller.showMessage('Could not capture camera image.');
+        setState(() => runState = _CaptureRunState.idle);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: widget.controller,
       builder: (context, _) {
-        final state = controller.value;
+        final state = widget.controller.value;
         final result = state.lastResult;
+        final isActive = state.isBusy ||
+            runState == _CaptureRunState.startingCamera ||
+            runState == _CaptureRunState.capturing;
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            AspectRatio(
-              aspectRatio: 4 / 3,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xff111827),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Icon(
-                      Icons.center_focus_strong,
-                      color: Colors.white70,
-                      size: 96,
-                    ),
-                    Container(
-                      width: 180,
-                      height: 230,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 2),
-                        borderRadius: BorderRadius.circular(90),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            CaptureCameraStage(
+              cameraSession: _cameraSession,
+              isStarting: runState == _CaptureRunState.startingCamera,
+              isCapturing: runState == _CaptureRunState.capturing,
             ),
             const SizedBox(height: 16),
             if (state.message != null) ...[
@@ -53,15 +119,16 @@ class CaptureScreen extends StatelessWidget {
               const SizedBox(height: 12),
             ],
             FilledButton.icon(
-              onPressed: state.isBusy ? null : controller.identifyDemoImage,
+              onPressed: isActive || !_cameraSession.isReady
+                  ? null
+                  : _identifyFromCamera,
               icon: const Icon(Icons.camera_alt),
-              label: Text(state.isBusy ? 'Checking...' : 'Capture / Upload'),
+              label: Text(isActive ? 'Checking...' : 'Check Face'),
             ),
             const SizedBox(height: 16),
             if (result == null)
-              const StatusBanner(
-                label:
-                    'Ready for capture. Camera integration will attach here.',
+              StatusBanner(
+                label: statusText ?? 'Camera starts when this screen opens.',
                 tone: BannerTone.info,
               )
             else

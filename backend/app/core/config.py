@@ -18,6 +18,7 @@ class Settings(BaseSettings):
         alias="FACE_CORS_ORIGINS",
     )
     model_pack: str = Field("buffalo_m", alias="FACE_MODEL_PACK")
+    preload_model: bool = Field(False, alias="FACE_PRELOAD_MODEL")
     recognition_threshold: float = Field(0.45, alias="FACE_RECOGNITION_THRESHOLD")
     probe_retention_days: int = Field(0, alias="FACE_PROBE_RETENTION_DAYS")
     max_upload_bytes: int = Field(5_242_880, alias="FACE_MAX_UPLOAD_BYTES")
@@ -34,4 +35,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

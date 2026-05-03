@@ -15,10 +15,10 @@ sudo apt update
 Refreshes Ubuntu package indexes.
 
 ```bash
-sudo apt install -y curl postgresql-common
+sudo apt install -y build-essential curl postgresql-common
 ```
 
-Installs `curl` for the `uv` installer and `postgresql-common` for the PostgreSQL APT script. `-y` answers yes to the install prompt.
+Installs native build tools, `curl` for the `uv` installer, and `postgresql-common` for the PostgreSQL APT script. `-y` answers yes to the install prompt.
 
 ```bash
 sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
@@ -95,6 +95,7 @@ FACE_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/face_detect
 FACE_STORAGE_ROOT=./local-storage
 FACE_JWT_SECRET=change-this-local-secret
 FACE_MODEL_PACK=buffalo_m
+FACE_PRELOAD_MODEL=false
 ```
 
 `YOUR_PASSWORD` must match the PostgreSQL password from step 2.
@@ -103,10 +104,10 @@ The app reads `.env`.
 ## 5. Install Dependencies
 
 ```bash
-uv sync --extra test
+uv sync
 ```
 
-Installs dependencies into `.venv`. `--extra test` includes the optional test dependencies from `pyproject.toml`.
+Installs dependencies into `.venv` using uv-managed Python.
 
 ## 6. Apply Database Schema
 
@@ -122,15 +123,47 @@ psql "postgresql://postgres:YOUR_PASSWORD@localhost:5432/face_detection" -c "\dt
 
 Lists database tables. `-c` runs one command and exits.
 
-## 7. Run Tests
+## 7. Create First Admin
+
+Run from `backend/`:
 
 ```bash
-uv run --extra test pytest -vv
+FACE_ADMIN_PASSWORD='YOUR_ADMIN_PASSWORD' uv run python -m app.cli.create_admin
 ```
 
-Runs tests in the `uv` environment. `--extra test` includes test dependencies and `-vv` increases pytest output detail.
+Creates or updates the local admin user named `admin`. `FACE_ADMIN_PASSWORD` supplies the password; there is no default password.
 
-## 8. Start Server
+```bash
+FACE_ADMIN_USERNAME='admin' FACE_ADMIN_DISPLAY_NAME='Local Admin' FACE_ADMIN_PASSWORD='YOUR_ADMIN_PASSWORD' uv run python -m app.cli.create_admin
+```
+
+Creates or updates the admin user with explicit username and display name.
+
+## 8. Run Tests
+
+```bash
+uv run pytest -vv
+```
+
+Runs tests in the `uv` environment. `-vv` increases pytest output detail. Database and GPU smoke tests skip unless their env vars are set.
+
+Optional database smoke on a configured PostgreSQL database:
+
+```bash
+FACE_TEST_DATABASE_URL='postgresql://postgres:YOUR_PASSWORD@localhost:5432/face_detection' uv run pytest tests/integration/test_database_paths.py -vv
+```
+
+Exercises repository/database paths. `FACE_TEST_DATABASE_URL` must be set for the test to run.
+
+Optional GPU smoke on the NVIDIA host:
+
+```bash
+FACE_RUN_GPU_SMOKE=1 uv run pytest -m gpu -vv
+```
+
+Loads the configured InsightFace model and checks provider reporting. `FACE_RUN_GPU_SMOKE=1` must be set. `-m gpu` selects GPU-marked tests, and `-vv` increases pytest output detail.
+
+## 9. Start Server
 
 ```bash
 uv run uvicorn app.main:create_app --factory --reload
@@ -138,7 +171,15 @@ uv run uvicorn app.main:create_app --factory --reload
 
 Starts the FastAPI server. `--factory` treats `create_app` as an app factory and `--reload` restarts the server after Python file changes.
 
-## 9. Check Server
+To preload the model during startup:
+
+```bash
+FACE_PRELOAD_MODEL=true uv run uvicorn app.main:create_app --factory
+```
+
+Starts the server and loads the model before serving requests. `--factory` treats `create_app` as an app factory.
+
+## 10. Check Server
 
 Open:
 
@@ -154,8 +195,7 @@ Expected:
 
 ## Current Gaps
 
-- First admin creation command is pending.
-- Real InsightFace/GPU smoke test is pending.
+- Real InsightFace/GPU smoke still needs target-host run.
 
 ## References
 
@@ -170,7 +210,7 @@ Expected:
 | `pgvector` | https://github.com/pgvector/pgvector |
 | `systemctl enable --now` | https://manpages.ubuntu.com/manpages/jammy/en/man1/systemctl.1.html |
 | `uv` install | https://docs.astral.sh/uv/getting-started/installation/ |
-| `uv sync --extra` | https://docs.astral.sh/uv/concepts/projects/sync/ |
+| `uv sync` | https://docs.astral.sh/uv/concepts/projects/sync/ |
 | `uv run` | https://docs.astral.sh/uv/concepts/projects/run/ |
 | pytest `-vv` | https://docs.pytest.org/en/stable/reference/reference.html#command-line-flags |
 | Uvicorn `--factory` and `--reload` | https://www.uvicorn.org/settings/ |

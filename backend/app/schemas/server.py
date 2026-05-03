@@ -19,4 +19,4 @@ class ServerInfo(BaseModel):
     service: str
     version: str
     model: ModelInfo
-
+    active_template_count: int | None = None
