@@ -19,6 +19,12 @@ abstract interface class ApiTransport {
     Map<String, Object?> body, {
     String? token,
   });
+  Future<ApiResponse> patchJson(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  });
+  Future<ApiResponse> delete(String path, {String? token});
   Future<ApiResponse> postMultipart(
     String path, {
     required String fileField,
@@ -34,6 +40,21 @@ class DemoApiTransport implements ApiTransport {
 
   @override
   Future<ApiResponse> get(String path, {String? token}) async {
+    if (path == '/v1/people/p-1001') {
+      return const ApiResponse(
+        statusCode: 200,
+        body: {
+          'id': 'p-1001',
+          'employee_code': 'EMP-1',
+          'display_name': 'Sample Person',
+          'job_title': 'Guard',
+          'access_status': 'active',
+          'extra_data': <String, Object?>{},
+          'created_at': '2026-05-03T00:00:00',
+          'updated_at': '2026-05-03T00:00:00',
+        },
+      );
+    }
     return switch (path) {
       '/v1/server/info' => const ApiResponse(
           statusCode: 200,
@@ -118,6 +139,38 @@ class DemoApiTransport implements ApiTransport {
         ),
       _ => const ApiResponse(statusCode: 404, body: {'code': 'not_found'}),
     };
+  }
+
+  @override
+  Future<ApiResponse> patchJson(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    if (path == '/v1/people/p-1001') {
+      return ApiResponse(
+        statusCode: 200,
+        body: {
+          'id': 'p-1001',
+          'employee_code': body['employee_code'] ?? 'EMP-1',
+          'display_name': body['display_name'] ?? 'Sample Person',
+          'job_title': body['job_title'],
+          'access_status': 'active',
+          'extra_data': <String, Object?>{},
+          'created_at': '2026-05-03T00:00:00',
+          'updated_at': '2026-05-03T00:00:00',
+        },
+      );
+    }
+    return const ApiResponse(statusCode: 404, body: {'code': 'not_found'});
+  }
+
+  @override
+  Future<ApiResponse> delete(String path, {String? token}) async {
+    if (path == '/v1/people/p-1001') {
+      return const ApiResponse(statusCode: 204, body: null);
+    }
+    return const ApiResponse(statusCode: 404, body: {'code': 'not_found'});
   }
 
   @override

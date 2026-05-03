@@ -128,6 +128,89 @@ class AppController extends ValueNotifier<AppState> {
     );
   }
 
+  Future<PersonSummary?> loadPerson(String personId) async {
+    final token = value.session?.token;
+    if (token == null) return null;
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.person(token, personId);
+    return result.when(
+      ok: (person) {
+        value = value.copyWith(isBusy: false);
+        return person;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
+    );
+  }
+
+  Future<PersonSummary?> updatePerson({
+    required String personId,
+    required String displayName,
+    String? employeeCode,
+    String? jobTitle,
+  }) async {
+    final token = value.session?.token;
+    if (token == null) return null;
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.updatePerson(
+      token: token,
+      personId: personId,
+      displayName: displayName,
+      employeeCode: employeeCode,
+      jobTitle: jobTitle,
+    );
+    return result.when(
+      ok: (person) {
+        value = value.copyWith(
+          people: [
+            for (final item in value.people)
+              if (item.id == person.id) person else item,
+          ],
+          isBusy: false,
+        );
+        return person;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
+    );
+  }
+
+  Future<bool> deletePerson(String personId) async {
+    final token = value.session?.token;
+    if (token == null) return false;
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.deletePerson(token: token, personId: personId);
+    return result.when(
+      ok: (_) {
+        value = value.copyWith(
+          people: [
+            for (final person in value.people)
+              if (person.id != personId) person,
+          ],
+          isBusy: false,
+        );
+        return true;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return false;
+      },
+    );
+  }
+
   Future<FaceTemplateSummary?> uploadEnrollmentSample({
     required String personId,
     required String fileName,

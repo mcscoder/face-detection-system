@@ -14,8 +14,8 @@ Build a local-first face recognition access-control system that runs on one mach
 
 ## Current Repository State
 
-- Implementation: backend foundation and Flutter client shell in progress
-- Application code: backend and client shell present
+- Implementation: backend foundation and Flutter mobile demo flows in progress
+- Application code: backend plus Flutter live identify, guided enrollment, and People management present
 - Current source of truth: [`deep-research-report.md`](../deep-research-report.md)
 - This document: product requirements and current scope, not a setup guide
 

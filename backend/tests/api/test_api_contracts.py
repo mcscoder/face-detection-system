@@ -11,20 +11,25 @@ from app.schemas.auth import CurrentUser
 class FakePeople:
     def __init__(self):
         self.calls = []
+        self.updated = None
+        self.deleted = None
+
+    def _person(self, **overrides):
+        person = {
+            "id": "person-1",
+            "display_name": "Local User",
+            "job_title": None,
+            "access_status": "active",
+            "extra_data": {"department": "security"},
+            "created_at": datetime(2026, 1, 1),
+            "updated_at": datetime(2026, 1, 1),
+        }
+        person.update(overrides)
+        return person
 
     def list(self, **kwargs):
         self.calls.append(kwargs)
-        return [
-            {
-                "id": "person-1",
-                "display_name": "Local User",
-                "job_title": None,
-                "access_status": "active",
-                "extra_data": {"department": "security"},
-                "created_at": datetime(2026, 1, 1),
-                "updated_at": datetime(2026, 1, 1),
-            }
-        ]
+        return [self._person()]
 
     def create(self, data):
         return {
@@ -37,6 +42,25 @@ class FakePeople:
             "created_at": datetime(2026, 1, 1),
             "updated_at": datetime(2026, 1, 1),
         }
+
+    def get(self, person_id):
+        if person_id != "person-1":
+            return None
+        return self._person(employee_code="EMP-1")
+
+    def update(self, person_id, data):
+        if person_id != "person-1":
+            return None
+        self.updated = {"person_id": person_id, **data}
+        return self._person(
+            display_name=data.get("display_name", "Local User"),
+            employee_code=data.get("employee_code"),
+            job_title=data.get("job_title"),
+        )
+
+    def soft_delete(self, person_id):
+        self.deleted = person_id
+        return person_id == "person-1"
 
 
 class FakeTemplates:
@@ -93,6 +117,30 @@ def test_create_person_serializes_database_uuid_id():
     assert response.status_code == 201
     assert isinstance(response.json()["id"], str)
     assert response.json()["display_name"] == "New User"
+
+
+def test_people_detail_update_and_delete_routes():
+    fake_people = FakePeople()
+    client = _client(["admin"], {"people": fake_people, "templates": FakeTemplates()})
+
+    detail = client.get("/v1/people/person-1")
+    update = client.patch(
+        "/v1/people/person-1",
+        json={
+            "display_name": "Updated User",
+            "employee_code": "EMP-2",
+            "job_title": "Supervisor",
+        },
+    )
+    delete = client.delete("/v1/people/person-1")
+
+    assert detail.status_code == 200
+    assert detail.json()["employee_code"] == "EMP-1"
+    assert update.status_code == 200
+    assert update.json()["display_name"] == "Updated User"
+    assert fake_people.updated["employee_code"] == "EMP-2"
+    assert delete.status_code == 204
+    assert fake_people.deleted == "person-1"
 
 
 def test_config_requires_admin_role():

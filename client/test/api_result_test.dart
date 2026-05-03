@@ -106,6 +106,20 @@ class _FailingTransport implements ApiTransport {
   }
 
   @override
+  Future<ApiResponse> patchJson(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    return response;
+  }
+
+  @override
+  Future<ApiResponse> delete(String path, {String? token}) async {
+    return response;
+  }
+
+  @override
   Future<ApiResponse> postMultipart(
     String path, {
     required String fileField,

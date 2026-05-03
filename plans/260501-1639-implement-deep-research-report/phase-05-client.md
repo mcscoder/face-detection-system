@@ -22,11 +22,12 @@ Build the Flutter mobile-first client with web fallback: login, live-camera reco
 ## Key Insights
 
 - Mobile app over LAN is the primary demo path.
-- Flutter web camera over LAN IP may require HTTPS; localhost web is secondary.
+- Flutter web is deferred by user request on 2026-05-04; mobile remains the active demo path.
 - Client only captures and displays. No local inference.
 - Enrollment must feel like phone or bank face setup: camera opens once, the app prompts the user what to do next, and accepted samples are captured automatically.
 - Identification must use a live camera session, not a gallery/image-picker-first flow.
 - Enrollment must not advance on timer alone; it advances only when the backend accepts the current prompt sample.
+- People tab must allow opening detail, editing/updating allowed fields, and removing a person with role-appropriate actions.
 
 ## Requirements
 
@@ -86,6 +87,10 @@ Use server response codes to drive UI states.
 - [x] Keep identify user inside one camera session while sending probe frames.
 - [x] Gate enrollment step advancement on backend sample acceptance, not countdown completion.
 - [x] Show current-prompt rejection feedback and retry the same prompt without moving forward.
+- [x] People list item opens detail information for that person.
+- [x] Person detail supports edit/update through the existing API.
+- [x] Person detail supports remove/soft-delete for Admin users and refreshes the list after removal.
+- [x] Web client deferred by user request; no longer blocking mobile/backend completion.
 
 ## Success Criteria
 
@@ -98,7 +103,7 @@ Use server response codes to drive UI states.
 - [x] Enrollment does not advance to the next prompt until backend validation accepts the current prompt.
 - [x] Enrollment shows retry feedback for no-face, multiple-face, low-quality, and wrong-pose states.
 - [x] Admin-only screens are blocked for non-admin roles.
-- [ ] Web client works on localhost after web platform files exist; LAN web HTTPS need documented if not implemented.
+- [x] People tab supports detail, edit/update, and remove flows on mobile.
 
 ## Risk Assessment
 

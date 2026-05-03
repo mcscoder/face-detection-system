@@ -5,11 +5,11 @@
 Repository status after the current implementation pass:
 
 - Product docs: present and synced to the current implementation pass
-- Application code: backend present; Flutter client shell plus guided mobile enrollment and live identify flows present
+- Application code: backend present; Flutter client shell plus guided mobile enrollment, live identify, and People detail/edit/remove flows present
 - Verified build/test state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Open verification gaps: manual target-phone enrollment smoke, target-host database/GPU smoke, full end-to-end hardware audit, Flutter web platform folder
 - Backend implementation: FastAPI foundation, auth/RBAC helpers, server health/info routes, role-gated active template count, people metadata filters, service boundaries, repositories
-- Flutter client implementation: shell, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, multipart filename sanitization, and tests present
+- Flutter client implementation: shell, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, People detail/edit/remove, multipart filename sanitization, and tests present
 - Database schema: PostgreSQL + pgvector schema file present
 - Deployment automation: component setup guides live in each component README
 
@@ -43,15 +43,16 @@ The PRD defines a local-first access-control system with:
 - PostgreSQL schema for users, roles, devices, people, face templates, recognition events, and settings
 - Roles and system settings seeded by schema; first admin command runs from `backend/` with `FACE_ADMIN_PASSWORD`
 - People list metadata filters via `metadata_key` and `metadata_value`
-- Upload validation, threshold decisioning, model loader abstraction, enrollment and recognition services
+- Upload validation, threshold decisioning, model loader abstraction, enrollment prompt pose validation, and recognition services
 - Unit/API tests runnable through `uv`; database and GPU smoke tests are opt-in and skip unless env vars are set
 
 ## Implemented Client Surface
 
 - `client/lib/main.dart` selects demo or live transport from `FACE_API_BASE_URL` or `env/mobile.json`
 - `client/lib/api/live_api_transport_io.dart` sends multipart uploads with sanitized filenames
+- `client/lib/screens/people_screen.dart` and `person_detail_*.dart` open person detail, update fields, and remove Admin-selected people through backend routes
 - `client/lib/screens/capture_screen.dart` uses a live camera session for identify uploads
-- `client/lib/screens/enrollment_screen.dart` uses a live camera session for prompt-gated guided enrollment uploads
+- `client/lib/screens/enrollment_screen.dart` uses a live camera session for prompt-gated guided enrollment uploads and stays on the same prompt after `WRONG_POSE`
 - Client tests cover controller state, live transport behavior, and screen actions
 - Android release APK build passes
 

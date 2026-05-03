@@ -10,7 +10,7 @@ Mục tiêu sản phẩm của bản PRD này là tạo ra một hệ thống v1
 
 ### Trạng thái triển khai hiện tại
 
-Trạng thái hiện tại của dự án đã lệch khỏi bản kế hoạch ban đầu ở phần trải nghiệm client và hợp đồng API enrollment. Mobile app hiện đã có **live-camera identify** và **guided live-camera enrollment**. Enrollment không còn là luồng upload 3-5 ảnh rời rạc; app mở một phiên camera, đi qua **5 prompt cố định** gồm nhìn thẳng, quay trái, quay phải, nhìn lên/xuống và diện mạo tự nhiên. Mỗi sample enrollment gửi lên server kèm `expected_pose`, và server chỉ cho bước tiếp theo khi ảnh có đúng một khuôn mặt, đủ chất lượng và đúng pose mong đợi.
+Trạng thái hiện tại của dự án đã lệch khỏi bản kế hoạch ban đầu ở phần trải nghiệm client và hợp đồng API enrollment. Mobile app hiện đã có **live-camera identify**, **guided live-camera enrollment**, và People tab có thể mở chi tiết, sửa hồ sơ, xóa mềm người dùng theo quyền Admin. Enrollment không còn là luồng upload 3-5 ảnh rời rạc; app mở một phiên camera, đi qua **5 prompt cố định** gồm nhìn thẳng, quay trái, quay phải, nhìn lên/xuống và diện mạo tự nhiên. Mỗi sample enrollment gửi lên server kèm `expected_pose`, và server chỉ cho bước tiếp theo khi ảnh có đúng một khuôn mặt, đủ chất lượng và đúng pose mong đợi.
 
 Phần đã xác minh hiện tại gồm backend tests pass, Flutter tests/analyze pass và Android release APK build pass. Phần còn mở gồm Flutter web platform folder, target-phone smoke thật, GPU/database smoke trên máy đích và full end-to-end enrollment -> identify audit trên phần cứng đích.
 
@@ -446,8 +446,9 @@ Trạng thái hiện tại của dự án so với tiêu chí v1:
 
 - Đã có FastAPI backend, auth/RBAC, people CRUD, enrollment API, recognition API, events/config routes.
 - Đã có Flutter mobile app dùng live-camera identify qua `/v1/recognitions/identify`.
+- Đã có People tab mở chi tiết, sửa hồ sơ, và xóa mềm người dùng theo quyền Admin.
 - Đã có guided live-camera enrollment 5 prompt qua `/v1/faces/{person_id}/samples`.
-- Đã có server-side prompt validation bằng `expected_pose`.
+- Đã có server-side prompt validation bằng `expected_pose`, reject wrong direction/no movement trước khi tạo template.
 - Đã có PostgreSQL + pgvector schema và repository path.
 - Đã có backend tests pass, Flutter tests/analyze pass, Android release APK build pass.
 - Chưa xác minh target-phone smoke thật.

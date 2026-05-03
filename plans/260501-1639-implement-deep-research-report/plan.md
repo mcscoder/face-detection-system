@@ -18,7 +18,7 @@ Implement the product described in [`deep-research-report.md`](../../deep-resear
 
 Work context: repository root
 
-Scope decision: HOLD. Build the v1 demo path only. Defer commercial-grade liveness/PAD, cloud deployment, multi-machine scaling, HR/attendance workflows, and advanced analytics.
+Scope decision: HOLD. Build the v1 mobile demo path only. Defer Flutter web, commercial-grade liveness/PAD, cloud deployment, multi-machine scaling, HR/attendance workflows, and advanced analytics.
 
 ## Cross-Plan Dependencies
 
@@ -35,6 +35,7 @@ No unfinished project or global plans found during scan. This plan has no detect
 | 5 | [Client](./phase-05-client.md) | In Progress |
 | 6 | [Testing](./phase-06-testing.md) | In Progress |
 | 7 | [Deployment](./phase-07-deployment.md) | In Progress |
+| 8 | [Critical Mobile Backend Fixes](./phase-08-critical-mobile-backend-fixes.md) | Complete |
 
 ## Dependencies
 
@@ -58,6 +59,7 @@ After Phase 1, Phase 2 and the client shell portions of Phase 5 can run in paral
 | 5 | `client/` Flutter app |
 | 6 | `backend/tests/`, `client/test/`, validation fixtures |
 | 7 | deployment docs, backup/restore commands |
+| 8 | `client/lib/screens/people_screen.dart`, `client/lib/screens/person_detail_*.dart`, `client/lib/state/app_controller.dart`, `client/lib/api/`, `backend/app/services/enrollment/`, related tests |
 
 ## Success Criteria
 
@@ -65,7 +67,7 @@ After Phase 1, Phase 2 and the client shell portions of Phase 5 can run in paral
 - PostgreSQL stores people, templates, events, config, and JSONB metadata.
 - Enrollment uses a guided live-camera flow that advances only after server validation confirms face presence, single face, quality, and expected prompt pose.
 - Recognition returns `event_id`, `matched`, `decision`, `person_id`, `similarity_score`, `threshold`, and minimal person summary.
-- Flutter mobile can guide enrollment and live-camera recognition capture over LAN; Flutter web works on localhost.
+- Flutter mobile can guide enrollment and live-camera recognition capture over LAN.
 - Admin-only fields and template/debug data are RBAC protected.
 - Recognition events are audited and probe image retention is explicit.
 - Tests cover services, API/database paths, recognition failure states, live identify flow, and prompt-gated enrollment states.

@@ -54,11 +54,23 @@ class LiveApiTransportIo implements ApiTransport {
     Map<String, Object?> body, {
     String? token,
   }) async {
+    return _sendJson('POST', path, body, token: token);
+  }
+
+  @override
+  Future<ApiResponse> patchJson(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    return _sendJson('PATCH', path, body, token: token);
+  }
+
+  @override
+  Future<ApiResponse> delete(String path, {String? token}) async {
     try {
-      final request = await _client.postUrl(_uri(path));
+      final request = await _client.deleteUrl(_uri(path));
       _authorize(request, token);
-      request.headers.contentType = ContentType.json;
-      request.write(jsonEncode(body));
       return _read(request);
     } catch (_) {
       return _networkError();
@@ -105,6 +117,23 @@ class LiveApiTransportIo implements ApiTransport {
   }
 
   Uri _uri(String path) => baseUrl.resolve(path);
+
+  Future<ApiResponse> _sendJson(
+    String method,
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    try {
+      final request = await _client.openUrl(method, _uri(path));
+      _authorize(request, token);
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode(body));
+      return _read(request);
+    } catch (_) {
+      return _networkError();
+    }
+  }
 
   static void _authorize(HttpClientRequest request, String? token) {
     if (token != null) {

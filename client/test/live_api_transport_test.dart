@@ -28,6 +28,18 @@ void main() {
       token: 'token-1',
       displayName: 'New Person',
     );
+    final detail = await client.person('token-1', 'person-1');
+    final updated = await client.updatePerson(
+      token: 'token-1',
+      personId: 'person-1',
+      displayName: 'Updated Person',
+      employeeCode: 'EMP-2',
+      jobTitle: 'Supervisor',
+    );
+    final removed = await client.deletePerson(
+      token: 'token-1',
+      personId: 'person-1',
+    );
     final template = await client.uploadEnrollmentSample(
       token: 'token-1',
       personId: 'person-1',
@@ -45,6 +57,9 @@ void main() {
     expect((login as ApiSuccess<Session>).value.token, 'token-1');
     expect(info, isA<ApiSuccess>());
     expect(person, isA<ApiSuccess>());
+    expect(detail, isA<ApiSuccess>());
+    expect(updated, isA<ApiSuccess>());
+    expect(removed, isA<ApiSuccess<void>>());
     expect(template, isA<ApiSuccess>());
     expect(identify, isA<ApiSuccess>());
   });
@@ -94,6 +109,46 @@ Future<void> _handleRequest(HttpRequest request) async {
       'updated_at': '2026-05-03T00:00:00',
     });
     return;
+  }
+
+  if (request.uri.path == '/v1/people/person-1') {
+    expect(request.headers.value(HttpHeaders.authorizationHeader),
+        'Bearer token-1');
+    if (request.method == 'GET') {
+      _writeJson(request.response, {
+        'id': 'person-1',
+        'employee_code': 'EMP-1',
+        'display_name': 'New Person',
+        'job_title': 'Guard',
+        'access_status': 'active',
+        'extra_data': <String, Object?>{},
+        'created_at': '2026-05-03T00:00:00',
+        'updated_at': '2026-05-03T00:00:00',
+      });
+      return;
+    }
+    if (request.method == 'PATCH') {
+      final body = jsonDecode(await utf8.decoder.bind(request).join())
+          as Map<String, Object?>;
+      expect(body['display_name'], 'Updated Person');
+      expect(body['employee_code'], 'EMP-2');
+      _writeJson(request.response, {
+        'id': 'person-1',
+        'employee_code': 'EMP-2',
+        'display_name': 'Updated Person',
+        'job_title': 'Supervisor',
+        'access_status': 'active',
+        'extra_data': <String, Object?>{},
+        'created_at': '2026-05-03T00:00:00',
+        'updated_at': '2026-05-03T00:00:00',
+      });
+      return;
+    }
+    if (request.method == 'DELETE') {
+      request.response.statusCode = HttpStatus.noContent;
+      await request.response.close();
+      return;
+    }
   }
 
   if (request.uri.path == '/v1/faces/person-1/samples') {

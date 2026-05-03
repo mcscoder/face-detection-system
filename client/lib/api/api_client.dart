@@ -30,6 +30,13 @@ class ApiClient {
     );
   }
 
+  Future<ApiResult<PersonSummary>> person(String token, String personId) async {
+    return _mapObject(
+      await _transport.get('/v1/people/$personId', token: token),
+      PersonSummary.fromJson,
+    );
+  }
+
   Future<ApiResult<PersonSummary>> createPerson({
     required String token,
     required String displayName,
@@ -49,6 +56,37 @@ class ApiClient {
           token: token),
       PersonSummary.fromJson,
     );
+  }
+
+  Future<ApiResult<PersonSummary>> updatePerson({
+    required String token,
+    required String personId,
+    required String displayName,
+    String? employeeCode,
+    String? jobTitle,
+  }) async {
+    return _mapObject(
+      await _transport.patchJson(
+        '/v1/people/$personId',
+        {
+          'display_name': displayName,
+          'employee_code': employeeCode,
+          'job_title': jobTitle,
+        },
+        token: token,
+      ),
+      PersonSummary.fromJson,
+    );
+  }
+
+  Future<ApiResult<void>> deletePerson({
+    required String token,
+    required String personId,
+  }) async {
+    final response =
+        await _transport.delete('/v1/people/$personId', token: token);
+    if (response.isOk) return const ApiSuccess<void>(null);
+    return ApiError(ApiFailure.fromStatus(response.statusCode, response.body));
   }
 
   Future<ApiResult<FaceTemplateSummary>> uploadEnrollmentSample({

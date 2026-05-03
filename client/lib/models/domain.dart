@@ -40,6 +40,7 @@ class PersonSummary {
   const PersonSummary({
     required this.id,
     required this.displayName,
+    this.employeeCode,
     this.jobTitle,
     this.accessStatus = 'unknown',
     this.metadata = const {},
@@ -47,6 +48,7 @@ class PersonSummary {
 
   final String id;
   final String displayName;
+  final String? employeeCode;
   final String? jobTitle;
   final String accessStatus;
   final Map<String, Object?> metadata;
@@ -57,6 +59,7 @@ class PersonSummary {
       displayName: json['display_name'] as String? ??
           json['name'] as String? ??
           'Unnamed',
+      employeeCode: json['employee_code'] as String?,
       jobTitle: json['job_title'] as String?,
       accessStatus: json['access_status'] as String? ?? 'unknown',
       metadata: json['extra_data'] is Map<String, Object?>

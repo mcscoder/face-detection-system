@@ -5,11 +5,11 @@ Local-first face recognition access-control system, planned for one machine with
 ## Current Status
 
 - Repository state: backend foundation in progress, Flutter client mobile guided enrollment and live identify implemented
-- Implementation state: FastAPI backend foundation, schema, service contracts, prompt-gated enrollment, and tests added; Flutter client live guided enrollment, live identify capture, and live transport are implemented
+- Implementation state: FastAPI backend foundation, schema, service contracts, strict prompt-gated enrollment, and tests added; Flutter client live guided enrollment, live identify capture, People detail/edit/remove, and live transport are implemented
 - Verified state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Existing product source: [`deep-research-report.md`](./deep-research-report.md)
 - Current backend code: [`backend/`](./backend)
-- Current client code: Flutter shell in [`client/`](./client) with guided camera enrollment, live camera identify capture, and live transport
+- Current client code: Flutter shell in [`client/`](./client) with guided camera enrollment, live camera identify capture, People detail/edit/remove, and live transport
 - Current database code: PostgreSQL schema file added
 
 ## Target Product
@@ -51,7 +51,8 @@ Local-first face recognition access-control system, planned for one machine with
 - Recognition upload validation, decision logic, model loader boundary, enrollment/identify services
 - Direct PostgreSQL schema setup path
 - Backend unit/API tests for deterministic behavior, plus opt-in database and GPU smoke tests
-- Flutter client shell, demo/live transports, Android live-camera identify capture, prompt-gated guided live-camera enrollment, operational screens, and tests
+- Flutter client shell, demo/live transports, Android live-camera identify capture, prompt-gated guided live-camera enrollment, People detail/edit/remove, operational screens, and tests
+- Enrollment prompt pose validation rejects missing prompts, wrong directions, and no-movement samples before template creation
 - Live transport sanitizes multipart filenames
 
 ## What Is Not Yet Complete

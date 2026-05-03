@@ -103,6 +103,8 @@ flutter run -d chrome
 - Live HTTP transport exists: `lib/api/live_api_transport.dart`, with multipart filename sanitization.
 - Capture opens one live camera session and uploads camera captures to `/v1/recognitions/identify`.
 - Enrollment creates a person, opens one live camera session, guides five prompts, and uploads samples with expected prompt metadata to `/v1/faces/{person_id}/samples`.
+- People tab opens person detail, updates person fields through `PATCH /v1/people/{person_id}`, and removes Admin-selected people through `DELETE /v1/people/{person_id}`.
+- Wrong-pose enrollment feedback keeps the app on the same prompt and does not increment accepted sample count.
 - Flutter tests, analysis, and Android release APK build pass.
 - Android platform files are present.
 - Manual target-phone enrollment smoke is still unverified.

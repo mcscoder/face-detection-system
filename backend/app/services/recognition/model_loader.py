@@ -1,4 +1,5 @@
 import logging
+import math
 from pathlib import Path
 from typing import Any
 
@@ -111,4 +112,7 @@ def _face_pose(face: Any) -> FacePose | None:
     pose = getattr(face, "pose", None)
     if pose is None or len(pose) < 3:
         return None
-    return FacePose(pitch=float(pose[0]), yaw=float(pose[1]), roll=float(pose[2]))
+    values = (float(pose[0]), float(pose[1]), float(pose[2]))
+    if not all(math.isfinite(value) for value in values):
+        return None
+    return FacePose(pitch=values[0], yaw=values[1], roll=values[2])

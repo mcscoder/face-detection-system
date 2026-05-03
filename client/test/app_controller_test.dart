@@ -34,4 +34,25 @@ void main() {
 
     controller.dispose();
   });
+
+  test('loads, updates, and deletes person records', () async {
+    final controller = AppController(const ApiClient(DemoApiTransport()));
+
+    await controller.login('admin', 'password');
+    final person = await controller.loadPerson('p-1001');
+    final updated = await controller.updatePerson(
+      personId: 'p-1001',
+      displayName: 'Updated Person',
+      employeeCode: 'EMP-2',
+      jobTitle: 'Supervisor',
+    );
+    final removed = await controller.deletePerson('p-1001');
+
+    expect(person?.id, 'p-1001');
+    expect(updated?.displayName, 'Updated Person');
+    expect(controller.value.people, isEmpty);
+    expect(removed, isTrue);
+
+    controller.dispose();
+  });
 }

@@ -31,6 +31,20 @@ class _UnsupportedLiveApiTransport implements ApiTransport {
   }
 
   @override
+  Future<ApiResponse> patchJson(
+    String path,
+    Map<String, Object?> body, {
+    String? token,
+  }) async {
+    return _networkError();
+  }
+
+  @override
+  Future<ApiResponse> delete(String path, {String? token}) async {
+    return _networkError();
+  }
+
+  @override
   Future<ApiResponse> postMultipart(
     String path, {
     required String fileField,

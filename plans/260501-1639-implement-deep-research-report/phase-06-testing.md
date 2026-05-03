@@ -28,6 +28,7 @@ Add unit, integration, API, client, and environment smoke tests for the complete
 ## Requirements
 
 - Functional: tests for people CRUD, prompt-gated guided camera enrollment, live camera identify, events, RBAC, upload validation, client result mapping.
+- Functional: regression tests must cover people detail/edit/remove and wrong-pose prompt rejection.
 - Non-functional: compile/type checks pass, tests can run locally with documented prerequisites.
 
 ## Architecture
@@ -60,6 +61,7 @@ Test layers:
 8. Add backend/API tests for enrollment wrong-pose rejection and stable prompt feedback codes.
 9. Add one documented end-to-end demo command using real server, database, and client API calls.
 10. Run compile/type/test commands and fix failures.
+11. Add Phase 8 regression tests for People tab detail/edit/remove flows and directional pose rejection.
 
 ## Todo List
 
@@ -74,6 +76,8 @@ Test layers:
 - [x] Backend-gated enrollment advancement tests pass.
 - [x] Wrong-pose enrollment rejection tests pass.
 - [ ] End-to-end demo command exists.
+- [x] Phase 8 People tab detail/edit/remove regression tests pass.
+- [x] Phase 8 directional wrong-pose regression tests pass.
 
 ## Success Criteria
 
@@ -84,6 +88,8 @@ Test layers:
 - [x] Tests cover guided enrollment prompt order, retry state, and completion state.
 - [x] Tests cover live identify camera session start, capture, submit, and result states.
 - [x] Tests cover enrollment staying on the same prompt after backend rejection.
+- [x] Tests prove wrong direction/no movement cannot pass directional prompt validation.
+- [x] Tests prove People tab mutations refresh visible state.
 - [x] Test data contains no real biometric assets.
 
 ## Risk Assessment

@@ -2,7 +2,7 @@
 
 ## Status
 
-Backend foundation and Flutter client shell are partially implemented. Full client integration and target-host GPU verification remain pending.
+Backend foundation and Flutter mobile demo flows are partially implemented. Target-host GPU/database verification remains pending.
 
 ## Architecture Overview
 
@@ -32,9 +32,10 @@ Single-host local-first system.
 |---|---|
 | `backend/app/api/` | v1 route contracts and server health/info routes |
 | `backend/app/services/recognition/` | upload validation, model boundary, decision logic, identify service |
-| `backend/app/services/enrollment/` | template creation service boundary |
+| `backend/app/services/enrollment/` | template creation service boundary with expected-prompt pose validation |
 | `backend/app/repositories/` | SQL repository methods for planned tables |
 | `backend/app/db/schema.sql` | PostgreSQL + pgvector schema |
+| `client/lib/screens/people_screen.dart` | mobile People detail, edit/update, and Admin remove flow |
 
 ## Data Flow
 

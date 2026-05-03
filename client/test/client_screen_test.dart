@@ -2,6 +2,7 @@ import 'package:face_detection_client/api/api_client.dart';
 import 'package:face_detection_client/api/api_transport.dart';
 import 'package:face_detection_client/screens/capture_screen.dart';
 import 'package:face_detection_client/screens/enrollment_screen.dart';
+import 'package:face_detection_client/screens/people_screen.dart';
 import 'package:face_detection_client/services/enrollment_camera_session.dart';
 import 'package:face_detection_client/state/app_controller.dart';
 import 'package:flutter/material.dart';
@@ -78,6 +79,44 @@ void main() {
     expect(find.text('Face forward'), findsOneWidget);
     expect(find.text('Gallery'), findsNothing);
     expect(find.text('0 accepted samples. 5 more required.'), findsOneWidget);
+
+    controller.dispose();
+  });
+
+  testWidgets('people tab opens detail, updates, and removes a person', (
+    tester,
+  ) async {
+    await _setLargeSurface(tester);
+    final controller = AppController(const ApiClient(DemoApiTransport()));
+    await controller.login('admin', 'password');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: PeopleScreen(controller: controller)),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Sample Person'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Person Detail'), findsOneWidget);
+    expect(find.text('Sample Person'), findsOneWidget);
+
+    await tester.tap(find.text('Edit'));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField).first, 'Updated Person');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Updated Person'), findsOneWidget);
+    expect(controller.value.people.first.displayName, 'Updated Person');
+
+    await tester.tap(find.text('Remove'));
+    await tester.pumpAndSettle();
+
+    expect(controller.value.people, isEmpty);
+    expect(find.text('Updated Person'), findsNothing);
 
     controller.dispose();
   });
@@ -166,6 +205,48 @@ void main() {
 
     controller.dispose();
   });
+
+  testWidgets('guided enrollment wrong pose keeps the same prompt', (
+    tester,
+  ) async {
+    await _setLargeSurface(tester);
+    final transport = _WrongPoseEnrollmentTransport();
+    final controller = AppController(ApiClient(transport));
+    final camera = _FakeCameraSession();
+    await controller.login('admin', 'password');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: EnrollmentScreen(
+            controller: controller,
+            cameraSession: camera,
+          ),
+        ),
+      ),
+    );
+
+    await tester.enterText(find.byType(TextField).first, 'Wrong Pose Person');
+    await tester.pump();
+    await tester.tap(find.text('Create Person'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start Face Setup'));
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pump();
+
+    expect(transport.sampleUploads, 2);
+    expect(transport.expectedPoses, ['face_forward', 'turn_left']);
+    expect(
+      find.text('Follow the current face prompt. Retrying Turn left.'),
+      findsOneWidget,
+    );
+    expect(find.text('1 accepted samples. 4 more required.'), findsOneWidget);
+    expect(find.text('Turn left'), findsOneWidget);
+
+    controller.dispose();
+  });
 }
 
 Future<void> _setLargeSurface(WidgetTester tester) async {
@@ -223,6 +304,40 @@ class _RetryEnrollmentTransport extends DemoApiTransport {
         return const ApiResponse(
           statusCode: 400,
           body: {'detail': 'NO_FACE'},
+        );
+      }
+    }
+    return super.postMultipart(
+      path,
+      fileField: fileField,
+      fileName: fileName,
+      bytes: bytes,
+      fields: fields,
+      token: token,
+    );
+  }
+}
+
+class _WrongPoseEnrollmentTransport extends DemoApiTransport {
+  int sampleUploads = 0;
+  final List<String> expectedPoses = [];
+
+  @override
+  Future<ApiResponse> postMultipart(
+    String path, {
+    required String fileField,
+    required String fileName,
+    required List<int> bytes,
+    Map<String, String> fields = const {},
+    String? token,
+  }) async {
+    if (path.contains('/v1/faces/')) {
+      sampleUploads++;
+      expectedPoses.add(fields['expected_pose'] ?? '');
+      if (sampleUploads == 2) {
+        return const ApiResponse(
+          statusCode: 400,
+          body: {'detail': 'WRONG_POSE'},
         );
       }
     }

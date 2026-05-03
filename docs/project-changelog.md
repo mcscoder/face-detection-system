@@ -27,6 +27,8 @@
 - Client guided enrollment tests for prompt order, automatic capture completion, backend-gated retry state, and wrong-pose feedback
 - Client live identify tests for camera session start, capture, submit, and result state
 - Client live transport test for form login, bearer auth, JSON post, and multipart upload
+- Client People tab detail, edit/update, and Admin remove flows
+- Backend and Flutter regressions for directional wrong-pose enrollment rejection
 - Initial documentation set for the repository
 - README with current status, target stack, quick-start status, and docs map
 - Project overview and PDR
@@ -60,6 +62,8 @@
 - Updated setup docs to require `FACE_ADMIN_PASSWORD`, describe auth-gated `active_template_count`, document people metadata filters, and list opt-in database/GPU smoke commands
 - Replaced identify image picking with live-camera capture in the mobile client
 - Added server-side enrollment prompt pose validation for front, left, right, up/down, and natural prompts
+- Tightened enrollment prompt pose validation to require prompt metadata and reject no-movement or wrong-direction samples before template creation
+- Extended live client transport to cover person detail, update, and delete API methods
 
 ### Removed
 
