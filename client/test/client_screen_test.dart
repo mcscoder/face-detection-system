@@ -261,6 +261,9 @@ class _FakeCameraSession implements EnrollmentCameraSession {
   bool isReady = false;
 
   @override
+  double get previewAspectRatio => 3 / 4;
+
+  @override
   Future<void> initialize() async {
     isReady = true;
   }

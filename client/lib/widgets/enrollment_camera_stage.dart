@@ -22,7 +22,7 @@ class EnrollmentCameraStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 3 / 4,
+      aspectRatio: cameraSession.previewAspectRatio,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: DecoratedBox(

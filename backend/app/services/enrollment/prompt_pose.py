@@ -37,9 +37,9 @@ def validate_prompt_pose(face: ExtractedFace, expected_pose: str | None) -> None
             and abs(pose.pitch) <= FORWARD_MAX_PITCH
         )
     elif prompt == EnrollmentPromptPose.TURN_LEFT:
-        accepted = pose.yaw <= -DIRECTIONAL_MIN_YAW
-    elif prompt == EnrollmentPromptPose.TURN_RIGHT:
         accepted = pose.yaw >= DIRECTIONAL_MIN_YAW
+    elif prompt == EnrollmentPromptPose.TURN_RIGHT:
+        accepted = pose.yaw <= -DIRECTIONAL_MIN_YAW
     else:
         accepted = (
             abs(pose.pitch) >= LOOK_MIN_PITCH

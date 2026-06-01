@@ -10,6 +10,7 @@ class EnrollmentCapture {
 
 abstract interface class EnrollmentCameraSession {
   bool get isReady;
+  double get previewAspectRatio;
 
   Future<void> initialize();
 
@@ -25,6 +26,15 @@ class LiveEnrollmentCameraSession implements EnrollmentCameraSession {
 
   @override
   bool get isReady => _controller?.value.isInitialized ?? false;
+
+  @override
+  double get previewAspectRatio {
+    final previewSize = _controller?.value.previewSize;
+    if (previewSize == null) return 3 / 4;
+    final longSide = previewSize.longestSide;
+    if (longSide == 0) return 3 / 4;
+    return previewSize.shortestSide / longSide;
+  }
 
   @override
   Future<void> initialize() async {

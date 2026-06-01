@@ -23,7 +23,7 @@ class TurnedLeftModel:
         return ExtractedFace(
             embedding=[0.1, 0.2],
             quality_score=0.9,
-            pose=FacePose(pitch=0.0, yaw=-18.0, roll=0.0),
+            pose=FacePose(pitch=0.0, yaw=18.0, roll=0.0),
         )
 
 
@@ -95,9 +95,9 @@ def test_upload_sample_requires_prompt_before_storage():
     ("expected_pose", "pose"),
     [
         ("turn_right", FacePose(pitch=0.0, yaw=0.0, roll=0.0)),
-        ("turn_right", FacePose(pitch=0.0, yaw=-18.0, roll=0.0)),
+        ("turn_right", FacePose(pitch=0.0, yaw=18.0, roll=0.0)),
         ("turn_left", FacePose(pitch=0.0, yaw=0.0, roll=0.0)),
-        ("turn_left", FacePose(pitch=0.0, yaw=18.0, roll=0.0)),
+        ("turn_left", FacePose(pitch=0.0, yaw=-18.0, roll=0.0)),
         ("look_up_down", FacePose(pitch=0.0, yaw=0.0, roll=0.0)),
         ("face_forward", FacePose(pitch=0.0, yaw=18.0, roll=0.0)),
     ],
@@ -110,8 +110,8 @@ def test_prompt_pose_rejects_wrong_direction_and_no_movement(expected_pose, pose
 @pytest.mark.parametrize(
     ("expected_pose", "pose"),
     [
-        ("turn_right", FacePose(pitch=0.0, yaw=18.0, roll=0.0)),
-        ("turn_left", FacePose(pitch=0.0, yaw=-18.0, roll=0.0)),
+        ("turn_right", FacePose(pitch=0.0, yaw=-18.0, roll=0.0)),
+        ("turn_left", FacePose(pitch=0.0, yaw=18.0, roll=0.0)),
         ("look_up_down", FacePose(pitch=14.0, yaw=0.0, roll=0.0)),
         ("face_forward", FacePose(pitch=0.0, yaw=0.0, roll=0.0)),
     ],
