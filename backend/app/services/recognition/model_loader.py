@@ -2,6 +2,7 @@ import logging
 import math
 from pathlib import Path
 from typing import Any
+from typing import Literal
 
 from app.services.recognition.types import ExtractedFace, FacePose, ModelStatus
 
@@ -9,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class FaceModelLoader:
-    def __init__(self, model_pack: str):
+    def __init__(self, model_pack: str, model_provider: Literal["auto", "cpu"] = "auto"):
         self.model_pack = model_pack
+        self.model_provider = model_provider
         self._model: Any | None = None
         self._providers: list[str] = []
         self._warning: str | None = None
@@ -27,10 +29,14 @@ class FaceModelLoader:
     def load(self) -> None:
         if self._model is not None:
             return
-        try:
-            from insightface.app import FaceAnalysis
-        except ImportError as exc:
-            raise RuntimeError("Run uv sync before loading model.") from exc
+        FaceAnalysis = _import_face_analysis()
+
+        if self.model_provider == "cpu":
+            model = _create_face_analysis(FaceAnalysis, self.model_pack, ["CPUExecutionProvider"])
+            model.prepare(ctx_id=-1, det_size=(640, 640))
+            self._providers = ["CPUExecutionProvider"]
+            self._model = model
+            return
 
         providers = ["CUDAExecutionProvider", "CPUExecutionProvider"]
         try:
@@ -76,6 +82,14 @@ def _decode_image(image_bytes: bytes) -> Any:
     if image is None:
         raise ValueError("INVALID_IMAGE")
     return image
+
+
+def _import_face_analysis() -> Any:
+    try:
+        from insightface.app import FaceAnalysis
+    except ImportError as exc:
+        raise RuntimeError("Run uv sync before loading model.") from exc
+    return FaceAnalysis
 
 
 def _create_face_analysis(face_analysis: Any, model_pack: str, providers: list[str]) -> Any:

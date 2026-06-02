@@ -92,8 +92,12 @@ def system_config(
 
 def model_loader(settings: Settings = Depends(get_settings)) -> FaceModelLoader:
     global _model_loader
-    if _model_loader is None or _model_loader.model_pack != settings.model_pack:
-        _model_loader = FaceModelLoader(settings.model_pack)
+    if (
+        _model_loader is None
+        or _model_loader.model_pack != settings.model_pack
+        or _model_loader.model_provider != settings.model_provider
+    ):
+        _model_loader = FaceModelLoader(settings.model_pack, settings.model_provider)
     return _model_loader
 
 

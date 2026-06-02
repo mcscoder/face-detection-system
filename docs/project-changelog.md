@@ -72,6 +72,7 @@
 - Added server-side enrollment prompt pose validation for front, left, right, up/down, and natural prompts
 - Tightened enrollment prompt pose validation to require prompt metadata and reject no-movement or wrong-direction samples before template creation
 - Extended live client transport to cover person detail, update, and delete API methods
+- Added `FACE_MODEL_PROVIDER=cpu` to force CPU-only InsightFace inference
 
 ### Removed
 

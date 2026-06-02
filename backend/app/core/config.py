@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,6 +19,7 @@ class Settings(BaseSettings):
         alias="FACE_CORS_ORIGINS",
     )
     model_pack: str = Field("buffalo_l", alias="FACE_MODEL_PACK")
+    model_provider: Literal["auto", "cpu"] = Field("auto", alias="FACE_MODEL_PROVIDER")
     preload_model: bool = Field(False, alias="FACE_PRELOAD_MODEL")
     recognition_threshold: float = Field(0.45, alias="FACE_RECOGNITION_THRESHOLD")
     probe_retention_days: int = Field(0, alias="FACE_PROBE_RETENTION_DAYS")

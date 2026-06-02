@@ -95,6 +95,7 @@ FACE_DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/face_detect
 FACE_STORAGE_ROOT=./local-storage
 FACE_JWT_SECRET=change-this-local-secret
 FACE_MODEL_PACK=buffalo_l
+FACE_MODEL_PROVIDER=cpu
 FACE_PRELOAD_MODEL=false
 ```
 

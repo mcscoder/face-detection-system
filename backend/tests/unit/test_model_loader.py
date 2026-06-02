@@ -1,4 +1,17 @@
-from app.services.recognition.model_loader import _repair_nested_model_pack
+from app.services.recognition.model_loader import FaceModelLoader, _repair_nested_model_pack
+
+
+class FakeFaceAnalysis:
+    created = []
+    prepared = []
+
+    def __init__(self, name, providers):
+        self.name = name
+        self.providers = providers
+        FakeFaceAnalysis.created.append((name, providers))
+
+    def prepare(self, ctx_id, det_size):
+        FakeFaceAnalysis.prepared.append((ctx_id, det_size))
 
 
 def test_repair_nested_model_pack_moves_onnx_files(tmp_path):
@@ -24,3 +37,19 @@ def test_repair_nested_model_pack_skips_flat_pack(tmp_path):
 
     assert repaired is False
     assert existing.exists()
+
+
+def test_cpu_model_provider_uses_cpu_execution_provider(monkeypatch):
+    FakeFaceAnalysis.created = []
+    FakeFaceAnalysis.prepared = []
+    monkeypatch.setattr(
+        "app.services.recognition.model_loader._import_face_analysis",
+        lambda: FakeFaceAnalysis,
+    )
+
+    model = FaceModelLoader("buffalo_l", "cpu")
+    model.load()
+
+    assert FakeFaceAnalysis.created == [("buffalo_l", ["CPUExecutionProvider"])]
+    assert FakeFaceAnalysis.prepared == [(-1, (640, 640))]
+    assert model.status().providers == ["CPUExecutionProvider"]

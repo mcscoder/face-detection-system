@@ -9,5 +9,3 @@ build/
 .flutter-plugins-dependencies
 local-storage/
 backups/
-.env
-.env.*
