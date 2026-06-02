@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../api/api_provider.dart';
+import '../widgets/api_provider_dropdown.dart';
 import '../widgets/face_oval_guide.dart';
+import '../widgets/user_home_demo_badge.dart';
 
 class UserHomeScreen extends StatelessWidget {
   const UserHomeScreen({
@@ -8,11 +11,17 @@ class UserHomeScreen extends StatelessWidget {
     required this.onVerifyFace,
     required this.onEnrollFace,
     required this.onManagerLogin,
+    required this.selectedApiProvider,
+    required this.apiProviders,
+    required this.onApiProviderChanged,
   });
 
   final VoidCallback onVerifyFace;
   final VoidCallback onEnrollFace;
   final VoidCallback onManagerLogin;
+  final ApiProviderOption selectedApiProvider;
+  final List<ApiProviderOption> apiProviders;
+  final ValueChanged<ApiProviderOption> onApiProviderChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +46,14 @@ class UserHomeScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const _DemoBadge(),
+                        const UserHomeDemoBadge(),
                         const Spacer(),
+                        ApiProviderDropdown(
+                          selectedProvider: selectedApiProvider,
+                          providers: apiProviders,
+                          onChanged: onApiProviderChanged,
+                        ),
+                        const SizedBox(width: 8),
                         IconButton(
                           tooltip: 'Manager',
                           onPressed: onManagerLogin,
@@ -102,31 +117,6 @@ class UserHomeScreen extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DemoBadge extends StatelessWidget {
-  const _DemoBadge();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Text(
-          'LOCAL DEMO',
-          style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-              ),
         ),
       ),
     );

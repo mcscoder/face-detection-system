@@ -31,6 +31,7 @@
 - Public user backend routes for unauthenticated face verify and face enrollment
 - Flutter public user mode with Verify Face and Enroll Face entry points
 - Flutter manager mode entry that keeps management screens behind login
+- Flutter public home API provider dropdown for DDNS and Ngrok backend URLs
 - Backend and Flutter regressions for directional wrong-pose enrollment rejection
 - Initial documentation set for the repository
 - README with current status, target stack, quick-start status, and docs map

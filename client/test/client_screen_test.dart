@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:face_detection_client/api/api_client.dart';
+import 'package:face_detection_client/api/api_provider.dart';
 import 'package:face_detection_client/api/api_transport.dart';
 import 'package:face_detection_client/screens/capture_screen.dart';
 import 'package:face_detection_client/screens/enrollment_screen.dart';
@@ -29,6 +30,40 @@ void main() {
     expect(find.byIcon(Icons.admin_panel_settings), findsOneWidget);
     expect(find.text('Login'), findsNothing);
     expect(find.byType(NavigationBar), findsNothing);
+
+    controller.dispose();
+  });
+
+  testWidgets('public home screen exposes API provider dropdown', (
+    tester,
+  ) async {
+    await _setLargeSurface(tester);
+    final controller = AppController(const ApiClient(DemoApiTransport()));
+    var selectedProvider = apiProviderOptions.first;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ShellScreen(
+          controller: controller,
+          selectedApiProvider: selectedProvider,
+          apiProviders: apiProviderOptions,
+          onApiProviderChanged: (provider) {
+            selectedProvider = provider;
+          },
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('API'), findsOneWidget);
+    expect(find.text('DDNS'), findsOneWidget);
+
+    await tester.tap(find.byType(DropdownButton<ApiProviderOption>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Ngrok').last);
+    await tester.pumpAndSettle();
+
+    expect(selectedProvider, apiProviderOptions.last);
 
     controller.dispose();
   });

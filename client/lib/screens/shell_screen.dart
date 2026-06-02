@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../api/api_provider.dart';
 import '../state/app_controller.dart';
 import 'capture_screen.dart';
 import 'enrollment_screen.dart';
@@ -12,9 +13,18 @@ import 'user_enrollment_screen.dart';
 import 'user_home_screen.dart';
 
 class ShellScreen extends StatefulWidget {
-  const ShellScreen({super.key, required this.controller});
+  const ShellScreen({
+    super.key,
+    required this.controller,
+    this.selectedApiProvider,
+    this.apiProviders,
+    this.onApiProviderChanged,
+  });
 
   final AppController controller;
+  final ApiProviderOption? selectedApiProvider;
+  final List<ApiProviderOption>? apiProviders;
+  final ValueChanged<ApiProviderOption>? onApiProviderChanged;
 
   @override
   State<ShellScreen> createState() => _ShellScreenState();
@@ -31,6 +41,7 @@ class _ShellScreenState extends State<ShellScreen> {
       builder: (context, _) {
         final state = widget.controller.value;
         if (!state.isLoggedIn) {
+          final apiProviders = widget.apiProviders ?? apiProviderOptions;
           if (showManagerLogin) {
             return LoginScreen(
               controller: widget.controller,
@@ -57,6 +68,10 @@ class _ShellScreenState extends State<ShellScreen> {
               );
             },
             onManagerLogin: () => setState(() => showManagerLogin = true),
+            selectedApiProvider:
+                widget.selectedApiProvider ?? apiProviders.first,
+            apiProviders: apiProviders,
+            onApiProviderChanged: widget.onApiProviderChanged ?? (_) {},
           );
         }
         final screens = [
