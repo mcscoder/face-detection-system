@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/guided_enrollment.dart';
+import 'manager_ui.dart';
 
 class EnrollmentActionPanel extends StatelessWidget {
   const EnrollmentActionPanel({
@@ -23,13 +24,7 @@ class EnrollmentActionPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.bodyMedium;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border.all(color: Theme.of(context).dividerColor),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return ManagerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -41,8 +36,8 @@ class EnrollmentActionPanel extends StatelessWidget {
                   child: LinearProgressIndicator(
                     minHeight: 9,
                     value: progress.value,
-                    backgroundColor:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color: managerBlue,
+                    backgroundColor: managerBlue.withValues(alpha: 0.12),
                   ),
                 ),
               ),

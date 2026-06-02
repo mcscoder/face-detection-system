@@ -31,6 +31,7 @@
 - Public user backend routes for unauthenticated face verify and face enrollment
 - Flutter public user mode with Verify Face and Enroll Face entry points
 - Flutter manager mode entry that keeps management screens behind login
+- Apple-inspired manager UI redesign with light neutrals, system-blue accents, rounded 8px surfaces, and refined sidebar/command bar
 - Flutter public home API provider dropdown for DDNS and Ngrok backend URLs
 - Backend and Flutter regressions for directional wrong-pose enrollment rejection
 - Initial documentation set for the repository
@@ -69,6 +70,7 @@
 - Updated Flutter startup flow from login-first to user-first with manager login as secondary entry
 - Preserved five-prompt guided enrollment while adding public user enrollment
 - Redesigned the Flutter demo UI with fixed public camera verification, real oval face guides, two-step public enrollment, and a rail-based manager console dashboard
+- Restyled manager Dashboard, People, Events, Settings, Enrollment, and Face Check screens; public user mode unchanged
 - Fixed public enrollment text overflow on short screens
 - Added server-side enrollment prompt pose validation for front, left, right, up/down, and natural prompts
 - Tightened enrollment prompt pose validation to require prompt metadata and reject no-movement or wrong-direction samples before template creation

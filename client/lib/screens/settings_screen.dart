@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../state/app_controller.dart';
+import '../widgets/manager_ui.dart';
 import '../widgets/status_banner.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -16,31 +17,23 @@ class SettingsScreen extends StatelessWidget {
         final state = controller.value;
         final config = state.config;
         final canAdmin = state.session?.canAdmin ?? false;
-        return ListView(
-          padding: const EdgeInsets.all(16),
+        return ManagerPage(
+          title: 'Settings',
+          subtitle: 'Recognition controls',
           children: [
-            Text(
-              'Settings',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            if (!canAdmin)
+            if (!canAdmin) ...[
               const StatusBanner(
                 label: 'Settings are admin-only.',
                 tone: BannerTone.warning,
               ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: const Color(0xffe5e7eb)),
-                borderRadius: BorderRadius.circular(8),
-              ),
+              const SizedBox(height: 12),
+            ],
+            ManagerCard(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const ManagerSectionTitle(title: 'Decision Policy'),
+                  const SizedBox(height: 14),
                   TextFormField(
                     enabled: canAdmin,
                     initialValue: (config?.threshold ?? 0.5).toStringAsFixed(2),
@@ -63,13 +56,13 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             FilledButton.icon(
               onPressed: canAdmin ? () {} : null,
               icon: const Icon(Icons.save),
               label: const Text('Save'),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             const StatusBanner(
               label:
                   'Threshold changes affect future recognition decisions only.',

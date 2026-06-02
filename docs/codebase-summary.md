@@ -5,11 +5,11 @@
 Repository status after the current implementation pass:
 
 - Product docs: present and synced to the current implementation pass
-- Application code: backend present; Flutter client public user mode, manager mode, guided mobile enrollment, live identify, and People detail/edit/remove flows present
+- Application code: backend present; Flutter client public user mode, Apple-inspired manager mode, guided mobile enrollment, live identify, and People detail/edit/remove flows present
 - Verified build/test state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Open verification gaps: manual target-phone enrollment smoke, target-host database/GPU smoke, full end-to-end hardware audit, Flutter web platform folder
 - Backend implementation: FastAPI foundation, auth/RBAC helpers, server health/info routes, role-gated active template count, people metadata filters, service boundaries, repositories
-- Flutter client implementation: public user verify/enroll mode, manager login mode, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, People detail/edit/remove, multipart filename sanitization, and tests present
+- Flutter client implementation: public user verify/enroll mode, Apple-like light manager shell, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, People detail/edit/remove, multipart filename sanitization, and tests present
 - Database schema: PostgreSQL + pgvector schema file present
 - Deployment automation: component setup guides live in each component README
 
@@ -51,6 +51,7 @@ The PRD defines a local-first access-control system with:
 - `client/lib/main.dart` selects demo or live transport from `FACE_API_BASE_URL` or `env/mobile.json`
 - `client/lib/api/live_api_transport_io.dart` sends multipart uploads with sanitized filenames
 - `client/lib/screens/people_screen.dart` and `person_detail_*.dart` open person detail, update fields, and remove Admin-selected people through backend routes
+- Manager Dashboard, People, Events, Settings, Enrollment, and Face Check screens now use the Apple-style light neutral shell with system-blue accents and rounded 8px surfaces
 - `client/lib/screens/capture_screen.dart` uses a live camera session for identify uploads
 - `client/lib/screens/enrollment_screen.dart` uses a live camera session for prompt-gated guided enrollment uploads and stays on the same prompt after `WRONG_POSE`
 - Client tests cover controller state, live transport behavior, and screen actions

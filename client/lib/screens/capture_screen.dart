@@ -7,6 +7,7 @@ import '../services/enrollment_camera_session.dart';
 import '../state/app_controller.dart';
 import '../widgets/capture_camera_stage.dart';
 import '../widgets/face_oval_guide.dart';
+import '../widgets/manager_ui.dart';
 import '../widgets/status_banner.dart';
 import 'result_screen.dart';
 
@@ -155,50 +156,41 @@ class _CaptureScreenState extends State<CaptureScreen> {
         final isActive = state.isBusy ||
             runState == _CaptureRunState.startingCamera ||
             runState == _CaptureRunState.capturing;
-        return ColoredBox(
-          color: const Color(0xfff5f7fb),
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text(
-                'Face Check',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
+        return ManagerPage(
+          title: 'Face Check',
+          subtitle: 'Capture a live probe and review the decision',
+          children: [
+            CaptureCameraStage(
+              cameraSession: _cameraSession,
+              isStarting: runState == _CaptureRunState.startingCamera,
+              isCapturing: runState == _CaptureRunState.capturing,
+            ),
+            const SizedBox(height: 16),
+            if (state.message != null) ...[
+              StatusBanner(label: state.message!, tone: BannerTone.error),
               const SizedBox(height: 12),
-              CaptureCameraStage(
-                cameraSession: _cameraSession,
-                isStarting: runState == _CaptureRunState.startingCamera,
-                isCapturing: runState == _CaptureRunState.capturing,
-              ),
-              const SizedBox(height: 16),
-              if (state.message != null) ...[
-                StatusBanner(label: state.message!, tone: BannerTone.error),
-                const SizedBox(height: 12),
-              ],
-              FilledButton.icon(
-                onPressed: isActive || !_cameraSession.isReady
-                    ? null
-                    : _identifyFromCamera,
-                icon: const Icon(Icons.center_focus_strong),
-                label: Text(isActive ? 'Checking...' : 'Check Face'),
-              ),
-              const SizedBox(height: 16),
-              if (result == null)
-                StatusBanner(
-                  label: statusText ?? 'Camera starts when this screen opens.',
-                  tone: BannerTone.info,
-                )
-              else
-                ResultScreen(result: result),
-              if (result?.decision == RecognitionDecision.error)
-                const Padding(
-                  padding: EdgeInsets.only(top: 12),
-                  child: Text('Retry or contact admin if this continues.'),
-                ),
             ],
-          ),
+            FilledButton.icon(
+              onPressed: isActive || !_cameraSession.isReady
+                  ? null
+                  : _identifyFromCamera,
+              icon: const Icon(Icons.center_focus_strong),
+              label: Text(isActive ? 'Checking...' : 'Check Face'),
+            ),
+            const SizedBox(height: 16),
+            if (result == null)
+              StatusBanner(
+                label: statusText ?? 'Camera starts when this screen opens.',
+                tone: BannerTone.info,
+              )
+            else
+              ResultScreen(result: result),
+            if (result?.decision == RecognitionDecision.error)
+              const Padding(
+                padding: EdgeInsets.only(top: 12),
+                child: Text('Retry or contact admin if this continues.'),
+              ),
+          ],
         );
       },
     );

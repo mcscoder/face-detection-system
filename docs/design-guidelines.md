@@ -18,7 +18,7 @@ Implemented direction for the current Flutter demo UI.
 - Face ID-inspired public surfaces with dark camera-first presentation
 - Public verify uses a fixed camera surface with a real oval face guide and public-only pass/fail/retry results
 - Public enrollment uses separate name and guided face-capture steps
-- Light manager console surfaces with rail navigation, dashboard metrics, compact panels, and clear status chips
+- Apple-like light manager surfaces with system-blue accents, 8px rounded cards, a refined sidebar, a compact command bar, dashboard metrics, and clear status chips
 - Strong emphasis on status states
 - Clean card layout for people and events
 - Large capture controls for operator use
@@ -50,11 +50,10 @@ Implemented direction for the current Flutter demo UI.
 
 ### Manager Screen
 
-- Dashboard-first console
-- Rail navigation on authenticated manager shell
+- Authenticated Apple-inspired manager shell
+- Dashboard, People, Events, Settings, Enrollment, and Face Check screens restyled
 - Searchable people list
 - Person detail view
-- Template list
 - Event log with compact decision filters
 - Threshold and retention settings
 

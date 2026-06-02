@@ -6,6 +6,7 @@ import 'api/api_transport.dart';
 import 'api/live_api_transport.dart';
 import 'screens/shell_screen.dart';
 import 'state/app_controller.dart';
+import 'widgets/manager_colors.dart';
 
 class FaceDetectionClientApp extends StatefulWidget {
   const FaceDetectionClientApp({
@@ -38,50 +39,81 @@ class _FaceDetectionClientAppState extends State<FaceDetectionClientApp> {
 
   @override
   Widget build(BuildContext context) {
+    final baseTextTheme = ThemeData.light().textTheme;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Face Detection',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xff0a84ff),
+          seedColor: managerBlue,
           brightness: Brightness.light,
         ),
         useMaterial3: true,
         visualDensity: VisualDensity.standard,
-        scaffoldBackgroundColor: const Color(0xfff5f7fb),
+        scaffoldBackgroundColor: managerBackground,
+        dividerColor: managerBorder,
+        textTheme: baseTextTheme.copyWith(
+          headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+            color: managerText,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
+          headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+            color: managerText,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
+          titleLarge: baseTextTheme.titleLarge?.copyWith(
+            color: managerText,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 0,
+          ),
+          titleMedium: baseTextTheme.titleMedium?.copyWith(
+            color: managerText,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0,
+          ),
+          bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+            color: managerMutedText,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0,
+          ),
+        ),
         appBarTheme: const AppBarTheme(
           centerTitle: false,
           elevation: 0,
-          backgroundColor: Color(0xfff5f7fb),
-          foregroundColor: Color(0xff111827),
+          backgroundColor: managerBackground,
+          foregroundColor: managerText,
         ),
         cardTheme: CardThemeData(
           elevation: 0,
-          color: Colors.white,
+          color: managerSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Color(0xffe5e7eb)),
+            side: const BorderSide(color: managerBorder),
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: managerSurface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xffd1d5db)),
+            borderSide: const BorderSide(color: managerBorder),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xffd1d5db)),
+            borderSide: const BorderSide(color: managerBorder),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Color(0xff0a84ff), width: 1.4),
+            borderSide: const BorderSide(color: managerBlue, width: 1.4),
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             minimumSize: const Size(64, 52),
+            backgroundColor: managerBlue,
+            foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),

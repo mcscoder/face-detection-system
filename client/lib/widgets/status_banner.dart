@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'manager_ui.dart';
+
 class StatusBanner extends StatelessWidget {
   const StatusBanner({
     super.key,
@@ -15,23 +17,23 @@ class StatusBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = switch (tone) {
-      BannerTone.success => (const Color(0xff047857), const Color(0xffecfdf5)),
-      BannerTone.warning => (const Color(0xffb45309), const Color(0xfffffbeb)),
-      BannerTone.error => (const Color(0xffb91c1c), const Color(0xfffef2f2)),
-      BannerTone.info => (const Color(0xff0f172a), const Color(0xfff8fafc)),
+      BannerTone.success => (managerGreen, const Color(0xfff0fff4)),
+      BannerTone.warning => (managerOrange, const Color(0xfffffbf0)),
+      BannerTone.error => (managerRed, const Color(0xfffff1f0)),
+      BannerTone.info => (managerBlue, const Color(0xfff2f8ff)),
     };
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: colors.$2,
-        border: Border.all(color: colors.$1.withValues(alpha: 0.35)),
+        border: Border.all(color: colors.$1.withValues(alpha: 0.2)),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -50,7 +52,7 @@ class StatusBanner extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: TextStyle(color: colors.$1, fontWeight: FontWeight.w600),
+              style: TextStyle(color: colors.$1, fontWeight: FontWeight.w700),
             ),
           ),
         ],

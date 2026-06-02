@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'manager_ui.dart';
+
 class EnrollmentPersonForm extends StatelessWidget {
   const EnrollmentPersonForm({
     super.key,
@@ -22,13 +24,7 @@ class EnrollmentPersonForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xffe5e7eb)),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return ManagerCard(
       child: Column(
         children: [
           TextField(

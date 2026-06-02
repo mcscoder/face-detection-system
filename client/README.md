@@ -103,7 +103,8 @@ flutter run -d chrome
 - Manager entry opens the existing login-gated management area.
 - Public verify uses a fixed camera screen with an oval face guide and public-only pass/fail/retry results.
 - Public enrollment uses separate name and guided five-pose capture steps.
-- Manager screens use a rail-based console with dashboard, People, Enroll, Verify, Events, and Settings.
+- Manager shell uses Apple-like light neutrals, system-blue accents, rounded 8px surfaces, and a refined sidebar plus command bar.
+- Manager screens cover Dashboard, People, Events, Settings, Enrollment, and Face Check.
 - Public user verify and enroll use live camera capture without client-side authentication.
 - Enrollment still uses five required prompt poses: face forward, turn left, turn right, look up/down, and natural look.
 - Demo transport remains available when no backend URL is configured: `lib/api/api_transport.dart`.

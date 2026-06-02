@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../api/api_provider.dart';
 import '../state/app_controller.dart';
+import '../widgets/manager_shell_chrome.dart';
+import '../widgets/manager_shell_navigation.dart';
+import '../widgets/manager_ui.dart';
 import 'capture_screen.dart';
 import 'enrollment_screen.dart';
 import 'events_screen.dart';
@@ -91,148 +94,64 @@ class _ShellScreenState extends State<ShellScreen> {
           EventsScreen(controller: widget.controller),
           SettingsScreen(controller: widget.controller),
         ];
-        return Scaffold(
-          backgroundColor: const Color(0xffeef2f6),
-          body: SafeArea(
-            child: Row(
-              children: [
-                NavigationRail(
-                  backgroundColor: Colors.white,
-                  selectedIconTheme: const IconThemeData(
-                    color: Color(0xff0f766e),
-                  ),
-                  selectedLabelTextStyle: const TextStyle(
-                    color: Color(0xff0f766e),
-                    fontWeight: FontWeight.w800,
-                  ),
-                  labelType: NavigationRailLabelType.all,
-                  selectedIndex: index,
-                  onDestinationSelected: (value) {
-                    setState(() => index = value);
-                  },
-                  leading: const Padding(
-                    padding: EdgeInsets.only(top: 12, bottom: 16),
-                    child: Icon(Icons.admin_panel_settings),
-                  ),
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.dashboard_outlined),
-                      selectedIcon: Icon(Icons.dashboard),
-                      label: Text('Dashboard'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.people_outline),
-                      selectedIcon: Icon(Icons.people),
-                      label: Text('People'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.person_add_alt),
-                      selectedIcon: Icon(Icons.badge),
-                      label: Text('Enroll'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.camera_alt_outlined),
-                      selectedIcon: Icon(Icons.photo_camera),
-                      label: Text('Verify'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.history),
-                      selectedIcon: Icon(Icons.receipt_long),
-                      label: Text('Events'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.settings_outlined),
-                      selectedIcon: Icon(Icons.settings),
-                      label: Text('Settings'),
-                    ),
-                  ],
-                ),
-                const VerticalDivider(width: 1),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _ManagerCommandBar(
-                        status: state.serverInfo?.status ?? 'local',
-                        onRefresh: widget.controller.refreshAdminData,
-                        onLogout: () {
-                          setState(() {
-                            index = 0;
-                            showManagerLogin = false;
-                          });
-                          widget.controller.logout();
-                        },
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 620;
+            return Scaffold(
+              backgroundColor: managerBackground,
+              body: SafeArea(
+                child: compact
+                    ? Column(
+                        children: [
+                          _CommandBar(state.serverInfo?.status ?? 'local'),
+                          Expanded(child: screens[index]),
+                          ManagerBottomNavigation(
+                            selectedIndex: index,
+                            onDestinationSelected: (value) {
+                              setState(() => index = value);
+                            },
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          ManagerSidebar(
+                            selectedIndex: index,
+                            onDestinationSelected: (value) {
+                              setState(() => index = value);
+                            },
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                _CommandBar(
+                                  state.serverInfo?.status ?? 'local',
+                                ),
+                                Expanded(child: screens[index]),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      Expanded(child: screens[index]),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
-}
 
-class _ManagerCommandBar extends StatelessWidget {
-  const _ManagerCommandBar({
-    required this.status,
-    required this.onRefresh,
-    required this.onLogout,
-  });
-
-  final String status;
-  final VoidCallback onRefresh;
-  final VoidCallback onLogout;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xffe2e8f0))),
-      ),
-      child: Row(
-        children: [
-          Text(
-            'Manager Console',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xffecfdf5),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xffbbf7d0)),
-            ),
-            child: Text(
-              status,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Color(0xff047857),
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            tooltip: 'Refresh',
-            onPressed: onRefresh,
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
-            tooltip: 'Logout',
-            onPressed: onLogout,
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
+  Widget _CommandBar(String status) {
+    return ManagerCommandBar(
+      status: status,
+      onRefresh: widget.controller.refreshAdminData,
+      onLogout: () {
+        setState(() {
+          index = 0;
+          showManagerLogin = false;
+        });
+        widget.controller.logout();
+      },
     );
   }
 }
