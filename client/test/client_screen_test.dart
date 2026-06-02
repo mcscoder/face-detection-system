@@ -117,9 +117,12 @@ void main() {
     controller.dispose();
   });
 
-  testWidgets('public verify identifies without login', (tester) async {
+  testWidgets('public verify auto-checks live frames until accepted', (
+    tester,
+  ) async {
     await _setLargeSurface(tester);
-    final controller = AppController(const ApiClient(DemoApiTransport()));
+    final transport = _SequentialIdentifyTransport();
+    final controller = AppController(ApiClient(transport));
     final camera = _FakeCameraSession();
 
     await tester.pumpWidget(
@@ -145,15 +148,16 @@ void main() {
     expect(find.byType(FaceOvalGuide), findsOneWidget);
     expect(find.text('Score'), findsNothing);
     expect(find.text('Threshold'), findsNothing);
+    expect(find.text('Scan Face'), findsNothing);
 
-    await tester.tap(find.text('Scan Face'));
     await tester.pumpAndSettle();
 
     expect(controller.value.isLoggedIn, isFalse);
-    expect(camera.captureCount, 1);
-    expect(controller.value.lastResult?.eventId, 'evt-demo');
-    expect(find.text('Not verified'), findsOneWidget);
-    expect(find.text('evt-demo'), findsNothing);
+    expect(camera.captureCount, 2);
+    expect(transport.identifyCalls, 2);
+    expect(controller.value.lastResult?.eventId, 'evt-allow');
+    expect(find.text('Verified'), findsOneWidget);
+    expect(find.text('Not verified'), findsNothing);
     expect(find.text('Threshold'), findsNothing);
 
     controller.dispose();
@@ -816,6 +820,56 @@ class _CountingCreateTransport extends DemoApiTransport {
   }) async {
     if (path == '/v1/user/people') createCalls++;
     return super.postJson(path, body, token: token);
+  }
+}
+
+class _SequentialIdentifyTransport extends DemoApiTransport {
+  int identifyCalls = 0;
+
+  @override
+  Future<ApiResponse> postMultipart(
+    String path, {
+    required String fileField,
+    required String fileName,
+    required List<int> bytes,
+    Map<String, String> fields = const {},
+    String? token,
+  }) async {
+    if (path == '/v1/user/recognitions/identify') {
+      identifyCalls++;
+      if (identifyCalls == 1) {
+        return const ApiResponse(
+          statusCode: 200,
+          body: {
+            'matched': false,
+            'decision': 'DENY',
+            'similarity_score': 0.41,
+            'threshold': 0.62,
+            'event_id': 'evt-deny',
+            'failure_reason': 'LOW_SCORE',
+          },
+        );
+      }
+      return const ApiResponse(
+        statusCode: 200,
+        body: {
+          'matched': true,
+          'decision': 'ALLOW',
+          'person_id': 'p-1001',
+          'similarity_score': 0.81,
+          'threshold': 0.62,
+          'event_id': 'evt-allow',
+        },
+      );
+    }
+    return super.postMultipart(
+      path,
+      fileField: fileField,
+      fileName: fileName,
+      bytes: bytes,
+      fields: fields,
+      token: token,
+    );
   }
 }
 
