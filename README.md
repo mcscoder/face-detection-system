@@ -4,12 +4,12 @@ Local-first face recognition access-control system, planned for one machine with
 
 ## Current Status
 
-- Repository state: backend foundation in progress, Flutter client mobile guided enrollment and live identify implemented
-- Implementation state: FastAPI backend foundation, schema, service contracts, strict prompt-gated enrollment, and tests added; Flutter client live guided enrollment, live identify capture, People detail/edit/remove, and live transport are implemented
+- Repository state: backend foundation in progress, Flutter client public user mode and manager mode implemented
+- Implementation state: FastAPI backend foundation, schema, service contracts, strict prompt-gated enrollment, public user verify/enroll endpoints, and tests added; Flutter client public user verify/enroll mode, manager management mode, live guided enrollment, live identify capture, People detail/edit/remove, and live transport are implemented
 - Verified state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Existing product source: [`deep-research-report.md`](./deep-research-report.md)
 - Current backend code: [`backend/`](./backend)
-- Current client code: Flutter shell in [`client/`](./client) with guided camera enrollment, live camera identify capture, People detail/edit/remove, and live transport
+- Current client code: Flutter shell in [`client/`](./client) with public user verify/enroll, manager People detail/edit/remove, guided camera enrollment, live camera identify capture, and live transport
 - Current database code: PostgreSQL schema file added
 
 ## Target Product
@@ -49,9 +49,12 @@ Local-first face recognition access-control system, planned for one machine with
 - Auth/RBAC helpers, API route contracts, repositories, and Pydantic schemas
 - First admin creation command that requires `FACE_ADMIN_PASSWORD`
 - Recognition upload validation, decision logic, model loader boundary, enrollment/identify services
+- Public user API routes for unauthenticated face verify and face enrollment
 - Direct PostgreSQL schema setup path
 - Backend unit/API tests for deterministic behavior, plus opt-in database and GPU smoke tests
 - Flutter client shell, demo/live transports, Android live-camera identify capture, prompt-gated guided live-camera enrollment, People detail/edit/remove, operational screens, and tests
+- Flutter client public user mode with Verify Face and Enroll Face only
+- Flutter manager mode with login-gated user management screens
 - Enrollment prompt pose validation rejects missing prompts, wrong directions, and no-movement samples before template creation
 - Live transport sanitizes multipart filenames
 

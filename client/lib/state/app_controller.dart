@@ -38,6 +38,7 @@ class AppState {
     bool? isBusy,
     String? message,
     bool clearMessage = false,
+    bool clearLastResult = false,
   }) {
     return AppState(
       session: session ?? this.session,
@@ -45,7 +46,7 @@ class AppState {
       people: people ?? this.people,
       events: events ?? this.events,
       config: config ?? this.config,
-      lastResult: lastResult ?? this.lastResult,
+      lastResult: clearLastResult ? null : lastResult ?? this.lastResult,
       isBusy: isBusy ?? this.isBusy,
       message: clearMessage ? null : message ?? this.message,
     );
@@ -96,6 +97,20 @@ class AppController extends ValueNotifier<AppState> {
     );
   }
 
+  Future<void> identifyUserImage({
+    required String fileName,
+    required List<int> bytes,
+  }) async {
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.identifyUser(fileName: fileName, bytes: bytes);
+    value = result.when(
+      ok: (recognition) =>
+          value.copyWith(lastResult: recognition, isBusy: false),
+      error: (failure) =>
+          value.copyWith(isBusy: false, message: failure.operatorMessage),
+    );
+  }
+
   Future<PersonSummary?> createPerson({
     required String displayName,
     String? employeeCode,
@@ -110,6 +125,29 @@ class AppController extends ValueNotifier<AppState> {
       employeeCode: employeeCode,
       jobTitle: jobTitle,
     );
+    return result.when(
+      ok: (person) {
+        value = value.copyWith(
+          people: [...value.people, person],
+          isBusy: false,
+        );
+        return person;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
+    );
+  }
+
+  Future<PersonSummary?> createUserPerson({
+    required String displayName,
+  }) async {
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.createUserPerson(displayName: displayName);
     return result.when(
       ok: (person) {
         value = value.copyWith(
@@ -242,6 +280,36 @@ class AppController extends ValueNotifier<AppState> {
     );
   }
 
+  Future<FaceTemplateSummary?> uploadUserEnrollmentSample({
+    required String personId,
+    required String enrollmentKey,
+    required String fileName,
+    required List<int> bytes,
+    required String expectedPose,
+  }) async {
+    value = value.copyWith(isBusy: true, clearMessage: true);
+    final result = await _api.uploadUserEnrollmentSample(
+      personId: personId,
+      enrollmentKey: enrollmentKey,
+      fileName: fileName,
+      bytes: bytes,
+      expectedPose: expectedPose,
+    );
+    return result.when(
+      ok: (template) {
+        value = value.copyWith(isBusy: false);
+        return template;
+      },
+      error: (failure) {
+        value = value.copyWith(
+          isBusy: false,
+          message: failure.operatorMessage,
+        );
+        return null;
+      },
+    );
+  }
+
   Future<void> refreshAdminData() async {
     final token = value.session?.token;
     if (token == null) return;
@@ -265,5 +333,9 @@ class AppController extends ValueNotifier<AppState> {
 
   void showMessage(String message) {
     value = value.copyWith(isBusy: false, message: message);
+  }
+
+  void clearLastResult() {
+    value = value.copyWith(clearLastResult: true, clearMessage: true);
   }
 }

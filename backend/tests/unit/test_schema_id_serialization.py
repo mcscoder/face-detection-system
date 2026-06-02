@@ -13,8 +13,8 @@ def test_face_template_response_serializes_uuid_ids():
         {
             "id": template_id,
             "person_id": person_id,
-            "model_pack": "buffalo_m",
-            "model_version": "buffalo_m",
+            "model_pack": "buffalo_l",
+            "model_version": "buffalo_l",
             "is_active": True,
         }
     )

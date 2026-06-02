@@ -128,12 +128,13 @@ class DemoApiTransport implements ApiTransport {
     String? token,
   }) async {
     return switch (path) {
-      '/v1/people' => const ApiResponse(
+      '/v1/people' || '/v1/user/people' => const ApiResponse(
           statusCode: 201,
           body: {
             'id': 'p-1002',
             'display_name': 'New Person',
             'access_status': 'active',
+            'enrollment_key': 'demo-enrollment-key',
             'extra_data': <String, Object?>{},
           },
         ),
@@ -182,7 +183,7 @@ class DemoApiTransport implements ApiTransport {
     Map<String, String> fields = const {},
     String? token,
   }) async {
-    if (path.contains('/v1/faces/')) {
+    if (path.contains('/v1/faces/') || path.contains('/v1/user/faces/')) {
       return const ApiResponse(
         statusCode: 200,
         body: {
@@ -195,7 +196,8 @@ class DemoApiTransport implements ApiTransport {
         },
       );
     }
-    if (path == '/v1/recognitions/identify') {
+    if (path == '/v1/recognitions/identify' ||
+        path == '/v1/user/recognitions/identify') {
       return const ApiResponse(
         statusCode: 200,
         body: {

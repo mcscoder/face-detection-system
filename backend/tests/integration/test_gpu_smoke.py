@@ -11,7 +11,7 @@ def test_model_load_reports_provider_status():
     if os.environ.get("FACE_RUN_GPU_SMOKE") != "1":
         pytest.skip("FACE_RUN_GPU_SMOKE=1 is not set.")
 
-    model = FaceModelLoader(os.environ.get("FACE_MODEL_PACK", "buffalo_m"))
+    model = FaceModelLoader(os.environ.get("FACE_MODEL_PACK", "buffalo_l"))
     model.load()
     status = model.status()
 

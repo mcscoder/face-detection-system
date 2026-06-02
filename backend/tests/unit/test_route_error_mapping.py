@@ -13,7 +13,7 @@ class FailingModel:
 
 
 class FrontFaceModel:
-    model_pack = "buffalo_m"
+    model_pack = "buffalo_l"
 
     def extract_single_face(self, image):
         return ExtractedFace(

@@ -58,6 +58,18 @@ class ApiClient {
     );
   }
 
+  Future<ApiResult<PersonSummary>> createUserPerson({
+    required String displayName,
+  }) async {
+    return _mapObject(
+      await _transport.postJson(
+        '/v1/user/people',
+        {'display_name': displayName},
+      ),
+      PersonSummary.fromJson,
+    );
+  }
+
   Future<ApiResult<PersonSummary>> updatePerson({
     required String token,
     required String personId,
@@ -109,6 +121,28 @@ class ApiClient {
     );
   }
 
+  Future<ApiResult<FaceTemplateSummary>> uploadUserEnrollmentSample({
+    required String personId,
+    required String enrollmentKey,
+    required String fileName,
+    required List<int> bytes,
+    required String expectedPose,
+  }) async {
+    return _mapObject(
+      await _transport.postMultipart(
+        '/v1/user/faces/$personId/samples',
+        fileField: 'file',
+        fileName: fileName,
+        bytes: bytes,
+        fields: {
+          'enrollment_key': enrollmentKey,
+          'expected_pose': expectedPose,
+        },
+      ),
+      FaceTemplateSummary.fromJson,
+    );
+  }
+
   Future<ApiResult<RecognitionResult>> identify({
     required String token,
     required String fileName,
@@ -121,6 +155,21 @@ class ApiClient {
         fileName: fileName,
         bytes: bytes,
         token: token,
+      ),
+      RecognitionResult.fromJson,
+    );
+  }
+
+  Future<ApiResult<RecognitionResult>> identifyUser({
+    required String fileName,
+    required List<int> bytes,
+  }) async {
+    return _mapObject(
+      await _transport.postMultipart(
+        '/v1/user/recognitions/identify',
+        fileField: 'file',
+        fileName: fileName,
+        bytes: bytes,
       ),
       RecognitionResult.fromJson,
     );

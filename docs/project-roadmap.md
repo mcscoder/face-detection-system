@@ -15,7 +15,7 @@
 | Backend foundation | in-progress | FastAPI project, config, auth, health/info endpoints, metadata filters, admin seed command |
 | Recognition pipeline | in-progress | Face detect, embed, compare, decision logic |
 | Database and schema | in-progress | PostgreSQL schema, pgvector, audit tables, metadata query path |
-| Client foundation | in-progress | Flutter Android shell, auth, demo/live API wiring, live identify upload, guided enrollment, People detail/edit/remove |
+| Client foundation | in-progress | Flutter Android public user mode, manager auth, demo/live API wiring, live identify upload, guided enrollment, People detail/edit/remove |
 | Enrollment workflows | in-progress | Guided live-camera enrollment rejects wrong/no-movement prompt samples; template management pending |
 | Recognition UX | in-progress | Live camera capture upload, match result, error states |
 | Testing and hardening | in-progress | Unit/API coverage plus opt-in database and GPU smoke tests |
@@ -41,7 +41,7 @@
 ### 3. Recognition Pipeline
 
 - Status: in-progress
-- Current note: model loader boundary, upload validation, threshold decision, and identify service exist; real model smoke pending
+- Current note: model loader boundary, `buffalo_l` default model pack, upload validation, threshold decision, and identify service exist; real model smoke pending
 - Tasks:
   - load InsightFace model
   - configure ONNX Runtime GPU
@@ -61,7 +61,7 @@
 ### 5. Client Foundation
 
 - Status: in-progress
-- Current note: Flutter app shell, Android platform files, operational screens, demo/live API abstraction, live-camera identify upload, People detail/edit/remove, prompt-gated guided live-camera enrollment, multipart filename sanitization, and widget/state tests exist; client tests/analyze pass; web platform files and manual target-phone smoke pending
+- Current note: Flutter app shell opens in public user mode with fixed camera verification, oval face guide, and two-step enrollment; manager mode remains login-gated with a rail-based console dashboard, Android platform files, operational screens, demo/live API abstraction, public live-camera identify/enroll upload, People detail/edit/remove, prompt-gated guided live-camera enrollment, multipart filename sanitization, and widget/state tests exist; client tests/analyze pass; web platform files and manual target-phone smoke pending
 - Tasks:
   - bootstrap Flutter app
   - add mobile-first capture flow
@@ -71,7 +71,7 @@
 ### 6. Enrollment And Recognition UX
 
 - Status: in-progress
-- Current note: client can create/update/remove people, guide five live-camera enrollment prompts with backend-gated wrong-pose rejection, and upload live-camera captures to identify; target-phone enrollment smoke and full end-to-end audit verification remain pending
+- Current note: public users can verify and enroll without client-side authentication, managers can create/update/remove people, guided enrollment still requires five backend-gated prompt poses, and target-phone enrollment smoke and full end-to-end audit verification remain pending
 - Tasks:
   - person create/edit screens
   - guided enrollment flow

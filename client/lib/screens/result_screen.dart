@@ -11,18 +11,30 @@ class ResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final status = _statusFor(result.decision);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        StatusBanner(label: status.label, tone: status.tone, icon: status.icon),
-        const SizedBox(height: 12),
-        _Metric(label: 'Person', value: result.personId ?? 'Unknown'),
-        _Metric(label: 'Score', value: _formatDouble(result.similarityScore)),
-        _Metric(label: 'Threshold', value: _formatDouble(result.threshold)),
-        _Metric(label: 'Event', value: result.eventId ?? 'Not recorded'),
-        if (result.message != null)
-          _Metric(label: 'Message', value: result.message!),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border.all(color: Theme.of(context).dividerColor),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          StatusBanner(
+            label: status.label,
+            tone: status.tone,
+            icon: status.icon,
+          ),
+          const SizedBox(height: 12),
+          _Metric(label: 'Person', value: result.personId ?? 'Unknown'),
+          _Metric(label: 'Score', value: _formatDouble(result.similarityScore)),
+          _Metric(label: 'Threshold', value: _formatDouble(result.threshold)),
+          _Metric(label: 'Event', value: result.eventId ?? 'Not recorded'),
+          if (result.message != null)
+            _Metric(label: 'Message', value: result.message!),
+        ],
+      ),
     );
   }
 }
@@ -89,10 +101,15 @@ class _Metric extends StatelessWidget {
             width: 96,
             child: Text(
               label,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
-          Expanded(child: Text(value)),
         ],
       ),
     );

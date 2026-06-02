@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/enrollment_camera_session.dart';
+import 'face_oval_guide.dart';
 
 class CaptureCameraStage extends StatelessWidget {
   const CaptureCameraStage({
@@ -21,7 +22,7 @@ class CaptureCameraStage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: DecoratedBox(
-          decoration: const BoxDecoration(color: Color(0xff111827)),
+          decoration: const BoxDecoration(color: Colors.black),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -29,9 +30,9 @@ class CaptureCameraStage extends StatelessWidget {
                 cameraSession.buildPreview()
               else
                 const Icon(
-                  Icons.center_focus_strong,
-                  color: Colors.white70,
-                  size: 96,
+                  Icons.camera_front_outlined,
+                  color: Colors.white54,
+                  size: 72,
                 ),
               _CaptureGuideOverlay(
                 isReady: cameraSession.isReady,
@@ -69,13 +70,11 @@ class _CaptureGuideOverlay extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
-          width: 190,
-          height: 250,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white, width: 2),
-            borderRadius: BorderRadius.circular(95),
-          ),
+        Container(color: Colors.black.withValues(alpha: 0.08)),
+        FaceOvalGuide(
+          color: Colors.white.withValues(alpha: isReady ? 0.9 : 0.5),
+          showScan: isCapturing,
+          progress: isCapturing ? 0.54 : 0,
         ),
         Positioned(
           left: 16,
@@ -107,7 +106,8 @@ class _OverlayLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.62),
+        color: Colors.black.withValues(alpha: 0.72),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(

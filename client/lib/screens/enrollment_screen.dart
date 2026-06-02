@@ -204,59 +204,67 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
             !_isActive &&
             personId.isNotEmpty &&
             !progress.isComplete;
-        return ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text('Enrollment', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 12),
-            EnrollmentPersonForm(
-              isActive: _isActive,
-              isBusy: state.isBusy,
-              canCreate: canCreate,
-              personIdController: _personIdController,
-              onDisplayNameChanged: (value) {
-                setState(() => displayName = value.trim());
-              },
-              onPersonIdChanged: (value) {
-                setState(() {
-                  personId = value.trim();
-                  progress = progress.reset();
-                  statusText = null;
-                });
-              },
-              onCreatePerson: _createPerson,
-            ),
-            const SizedBox(height: 16),
-            EnrollmentCameraStage(
-              cameraSession: _cameraSession,
-              prompt: progress.currentPrompt,
-              countdownSeconds: countdownSeconds,
-              isStarting: runState == _EnrollmentRunState.startingCamera,
-              isActive: _isActive,
-            ),
-            const SizedBox(height: 16),
-            EnrollmentActionPanel(
-              progress: progress,
-              canStart: canStart,
-              isActive: _isActive,
-              onStart: _beginGuidedCapture,
-              onCancel: _cancelEnrollment,
-            ),
-            const SizedBox(height: 16),
-            if (state.message != null) ...[
-              StatusBanner(label: state.message!, tone: BannerTone.error),
-              const SizedBox(height: 12),
-            ],
-            if (!canEnroll) ...[
-              const StatusBanner(
-                label: 'Enrollment role required.',
-                tone: BannerTone.warning,
+        return ColoredBox(
+          color: const Color(0xfff5f7fb),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(
+                'Enrollment',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
               ),
               const SizedBox(height: 12),
+              EnrollmentPersonForm(
+                isActive: _isActive,
+                isBusy: state.isBusy,
+                canCreate: canCreate,
+                personIdController: _personIdController,
+                onDisplayNameChanged: (value) {
+                  setState(() => displayName = value.trim());
+                },
+                onPersonIdChanged: (value) {
+                  setState(() {
+                    personId = value.trim();
+                    progress = progress.reset();
+                    statusText = null;
+                  });
+                },
+                onCreatePerson: _createPerson,
+              ),
+              const SizedBox(height: 16),
+              EnrollmentCameraStage(
+                cameraSession: _cameraSession,
+                prompt: progress.currentPrompt,
+                countdownSeconds: countdownSeconds,
+                isStarting: runState == _EnrollmentRunState.startingCamera,
+                isActive: _isActive,
+              ),
+              const SizedBox(height: 16),
+              EnrollmentActionPanel(
+                progress: progress,
+                canStart: canStart,
+                isActive: _isActive,
+                onStart: _beginGuidedCapture,
+                onCancel: _cancelEnrollment,
+              ),
+              const SizedBox(height: 16),
+              if (state.message != null) ...[
+                StatusBanner(label: state.message!, tone: BannerTone.error),
+                const SizedBox(height: 12),
+              ],
+              if (!canEnroll) ...[
+                const StatusBanner(
+                  label: 'Enrollment role required.',
+                  tone: BannerTone.warning,
+                ),
+                const SizedBox(height: 12),
+              ],
+              if (statusText != null)
+                StatusBanner(label: statusText!, tone: BannerTone.info),
             ],
-            if (statusText != null)
-              StatusBanner(label: statusText!, tone: BannerTone.info),
-          ],
+          ),
         );
       },
     );

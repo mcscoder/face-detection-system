@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned product design guidance only.
+Implemented direction for the current Flutter demo UI.
 
 ## Design Principles
 
@@ -15,6 +15,10 @@ Planned product design guidance only.
 ## Visual Direction
 
 - Neutral, high-contrast UI
+- Face ID-inspired public surfaces with dark camera-first presentation
+- Public verify uses a fixed camera surface with a real oval face guide and public-only pass/fail/retry results
+- Public enrollment uses separate name and guided face-capture steps
+- Light manager console surfaces with rail navigation, dashboard metrics, compact panels, and clear status chips
 - Strong emphasis on status states
 - Clean card layout for people and events
 - Large capture controls for operator use
@@ -22,26 +26,36 @@ Planned product design guidance only.
 
 ## Screen Types
 
+### Public User Home
+
+- Only two primary actions: Verify Face and Enroll Face
+- Manager entry is secondary
+- Use a dark Face ID demo presentation with one strong primary action
+- Avoid exposing operational controls
+
 ### Capture Screen
 
-- Full-screen camera preview
-- Visible face framing guide
+- Full-screen public camera preview
+- Visible oval face framing guide
 - One primary action: capture
-- Immediate feedback on no face, multi-face, low quality, match, or deny
+- Public mode hides score, threshold, event ID, person ID, and manager diagnostics
 
 ### Enrollment Screen
 
-- Step-by-step wizard
+- Step 1 collects public user name
+- Step 2 runs guided five-pose face capture
 - Clear count of required images
 - Progress indicator for remaining samples
 - Quality feedback after each image
 
-### Admin Screen
+### Manager Screen
 
+- Dashboard-first console
+- Rail navigation on authenticated manager shell
 - Searchable people list
 - Person detail view
 - Template list
-- Event log with filters
+- Event log with compact decision filters
 - Threshold and retention settings
 
 ## Content Rules

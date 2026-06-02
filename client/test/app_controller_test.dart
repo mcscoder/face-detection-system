@@ -55,4 +55,30 @@ void main() {
 
     controller.dispose();
   });
+
+  test('public user methods work without login', () async {
+    final controller = AppController(const ApiClient(DemoApiTransport()));
+
+    final person =
+        await controller.createUserPerson(displayName: 'Public User');
+    final template = await controller.uploadUserEnrollmentSample(
+      personId: person!.id,
+      enrollmentKey: person.enrollmentKey!,
+      fileName: 'sample.jpg',
+      bytes: const [1, 2, 3],
+      expectedPose: 'face_forward',
+    );
+    await controller.identifyUserImage(
+      fileName: 'probe.jpg',
+      bytes: const [4, 5, 6],
+    );
+
+    expect(controller.value.isLoggedIn, isFalse);
+    expect(person.displayName, 'New Person');
+    expect(person.enrollmentKey, isNotEmpty);
+    expect(template?.isActive, isTrue);
+    expect(controller.value.lastResult?.eventId, 'evt-demo');
+
+    controller.dispose();
+  });
 }

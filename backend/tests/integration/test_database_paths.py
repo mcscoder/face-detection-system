@@ -44,8 +44,8 @@ def test_database_schema_repository_paths():
             {
                 "person_id": person["id"],
                 "embedding": [0.0] * 512,
-                "model_pack": "buffalo_m",
-                "model_version": "buffalo_m",
+                "model_pack": "buffalo_l",
+                "model_version": "buffalo_l",
                 "quality_score": 0.9,
             }
         )

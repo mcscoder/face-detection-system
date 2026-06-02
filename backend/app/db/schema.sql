@@ -89,6 +89,9 @@ ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO system_settings (key, value) VALUES
   ('recognition_threshold', '0.45'::jsonb),
-  ('probe_retention_days', '0'::jsonb),
-  ('model_pack', '"buffalo_m"'::jsonb)
+  ('probe_retention_days', '0'::jsonb)
 ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO system_settings (key, value) VALUES
+  ('model_pack', '"buffalo_l"'::jsonb)
+ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = now();

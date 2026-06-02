@@ -77,7 +77,7 @@ def _client(roles: list[str] | None = None, fake_repos: dict | None = None) -> T
     app.dependency_overrides[system_config] = lambda: {
         "recognition_threshold": 0.45,
         "probe_retention_days": 0,
-        "model_pack": "buffalo_m",
+        "model_pack": "buffalo_l",
     }
     if roles is not None:
         app.dependency_overrides[current_user] = lambda: CurrentUser(

@@ -5,11 +5,11 @@
 Repository status after the current implementation pass:
 
 - Product docs: present and synced to the current implementation pass
-- Application code: backend present; Flutter client shell plus guided mobile enrollment, live identify, and People detail/edit/remove flows present
+- Application code: backend present; Flutter client public user mode, manager mode, guided mobile enrollment, live identify, and People detail/edit/remove flows present
 - Verified build/test state: backend tests pass, client tests/analyze pass, Android release APK build passes
 - Open verification gaps: manual target-phone enrollment smoke, target-host database/GPU smoke, full end-to-end hardware audit, Flutter web platform folder
 - Backend implementation: FastAPI foundation, auth/RBAC helpers, server health/info routes, role-gated active template count, people metadata filters, service boundaries, repositories
-- Flutter client implementation: shell, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, People detail/edit/remove, multipart filename sanitization, and tests present
+- Flutter client implementation: public user verify/enroll mode, manager login mode, Android platform files, demo/live API transports, live camera identify capture, prompt-gated guided camera enrollment, People detail/edit/remove, multipart filename sanitization, and tests present
 - Database schema: PostgreSQL + pgvector schema file present
 - Deployment automation: component setup guides live in each component README
 

@@ -17,7 +17,7 @@ class Settings(BaseSettings):
         ["http://localhost:3000", "http://localhost:5173"],
         alias="FACE_CORS_ORIGINS",
     )
-    model_pack: str = Field("buffalo_m", alias="FACE_MODEL_PACK")
+    model_pack: str = Field("buffalo_l", alias="FACE_MODEL_PACK")
     preload_model: bool = Field(False, alias="FACE_PRELOAD_MODEL")
     recognition_threshold: float = Field(0.45, alias="FACE_RECOGNITION_THRESHOLD")
     probe_retention_days: int = Field(0, alias="FACE_PROBE_RETENTION_DAYS")

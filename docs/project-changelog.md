@@ -28,6 +28,9 @@
 - Client live identify tests for camera session start, capture, submit, and result state
 - Client live transport test for form login, bearer auth, JSON post, and multipart upload
 - Client People tab detail, edit/update, and Admin remove flows
+- Public user backend routes for unauthenticated face verify and face enrollment
+- Flutter public user mode with Verify Face and Enroll Face entry points
+- Flutter manager mode entry that keeps management screens behind login
 - Backend and Flutter regressions for directional wrong-pose enrollment rejection
 - Initial documentation set for the repository
 - README with current status, target stack, quick-start status, and docs map
@@ -41,6 +44,7 @@
 
 ### Changed
 
+- Upgraded the default InsightFace model pack from `buffalo_m` to `buffalo_l`
 - Fixed API response serialization for database UUID IDs in people, face template, and event responses
 - Repaired nested InsightFace model-pack extraction before model startup retry
 - Moved InsightFace, ONNX Runtime GPU, OpenCV, and NumPy into normal backend dependencies
@@ -61,6 +65,10 @@
 - Added backup/restore, admin seed, model preload, and GPU smoke commands to setup docs
 - Updated setup docs to require `FACE_ADMIN_PASSWORD`, describe auth-gated `active_template_count`, document people metadata filters, and list opt-in database/GPU smoke commands
 - Replaced identify image picking with live-camera capture in the mobile client
+- Updated Flutter startup flow from login-first to user-first with manager login as secondary entry
+- Preserved five-prompt guided enrollment while adding public user enrollment
+- Redesigned the Flutter demo UI with fixed public camera verification, real oval face guides, two-step public enrollment, and a rail-based manager console dashboard
+- Fixed public enrollment text overflow on short screens
 - Added server-side enrollment prompt pose validation for front, left, right, up/down, and natural prompts
 - Tightened enrollment prompt pose validation to require prompt metadata and reject no-movement or wrong-direction samples before template creation
 - Extended live client transport to cover person detail, update, and delete API methods

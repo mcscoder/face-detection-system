@@ -22,30 +22,44 @@ class EnrollmentPersonForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          enabled: !isActive,
-          decoration: const InputDecoration(labelText: 'Display name'),
-          onChanged: onDisplayNameChanged,
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: canCreate ? onCreatePerson : null,
-            icon: const Icon(Icons.person_add),
-            label: Text(isBusy ? 'Working...' : 'Create Person'),
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: const Color(0xffe5e7eb)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          TextField(
+            enabled: !isActive,
+            decoration: const InputDecoration(
+              labelText: 'Display name',
+              prefixIcon: Icon(Icons.badge_outlined),
+            ),
+            onChanged: onDisplayNameChanged,
           ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          enabled: !isActive,
-          controller: personIdController,
-          decoration: const InputDecoration(labelText: 'Person ID'),
-          onChanged: onPersonIdChanged,
-        ),
-      ],
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: canCreate ? onCreatePerson : null,
+              icon: const Icon(Icons.person_add),
+              label: Text(isBusy ? 'Working...' : 'Create Person'),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            enabled: !isActive,
+            controller: personIdController,
+            decoration: const InputDecoration(
+              labelText: 'Person ID',
+              prefixIcon: Icon(Icons.tag),
+            ),
+            onChanged: onPersonIdChanged,
+          ),
+        ],
+      ),
     );
   }
 }

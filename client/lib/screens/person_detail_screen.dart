@@ -94,6 +94,7 @@ class _PersonDetailScreenState extends State<PersonDetailScreen> {
         final canEdit = state.session?.canEnroll ?? false;
         final canRemove = state.session?.canAdmin ?? false;
         return Scaffold(
+          backgroundColor: const Color(0xfff5f7fb),
           appBar: AppBar(title: const Text('Person Detail')),
           body: ListView(
             padding: const EdgeInsets.all(16),

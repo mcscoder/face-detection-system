@@ -44,6 +44,7 @@ class PersonSummary {
     this.jobTitle,
     this.accessStatus = 'unknown',
     this.metadata = const {},
+    this.enrollmentKey,
   });
 
   final String id;
@@ -52,6 +53,7 @@ class PersonSummary {
   final String? jobTitle;
   final String accessStatus;
   final Map<String, Object?> metadata;
+  final String? enrollmentKey;
 
   factory PersonSummary.fromJson(Map<String, Object?> json) {
     return PersonSummary(
@@ -62,6 +64,7 @@ class PersonSummary {
       employeeCode: json['employee_code'] as String?,
       jobTitle: json['job_title'] as String?,
       accessStatus: json['access_status'] as String? ?? 'unknown',
+      enrollmentKey: json['enrollment_key'] as String?,
       metadata: json['extra_data'] is Map<String, Object?>
           ? json['extra_data'] as Map<String, Object?>
           : json['metadata'] is Map<String, Object?>

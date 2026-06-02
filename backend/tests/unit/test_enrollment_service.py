@@ -6,7 +6,7 @@ from app.services.recognition.types import ExtractedFace, FacePose
 
 
 class FakeModel:
-    model_pack = "buffalo_m"
+    model_pack = "buffalo_l"
 
     def extract_single_face(self, image):
         return ExtractedFace(
@@ -17,7 +17,7 @@ class FakeModel:
 
 
 class TurnedLeftModel:
-    model_pack = "buffalo_m"
+    model_pack = "buffalo_l"
 
     def extract_single_face(self, image):
         return ExtractedFace(
@@ -53,7 +53,7 @@ def test_upload_sample_creates_template_with_model_metadata():
 
     assert result["id"] == "template-1"
     assert templates.created["person_id"] == "person-1"
-    assert templates.created["model_pack"] == "buffalo_m"
+    assert templates.created["model_pack"] == "buffalo_l"
     assert templates.created["source_image_path"] == "enrollment/sample.jpg"
 
 

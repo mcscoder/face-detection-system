@@ -99,6 +99,13 @@ flutter run -d chrome
 
 ## Current State
 
+- App opens in public user mode with Verify Face and Enroll Face.
+- Manager entry opens the existing login-gated management area.
+- Public verify uses a fixed camera screen with an oval face guide and public-only pass/fail/retry results.
+- Public enrollment uses separate name and guided five-pose capture steps.
+- Manager screens use a rail-based console with dashboard, People, Enroll, Verify, Events, and Settings.
+- Public user verify and enroll use live camera capture without client-side authentication.
+- Enrollment still uses five required prompt poses: face forward, turn left, turn right, look up/down, and natural look.
 - Demo transport remains available when no backend URL is configured: `lib/api/api_transport.dart`.
 - Live HTTP transport exists: `lib/api/live_api_transport.dart`, with multipart filename sanitization.
 - Capture opens one live camera session and uploads camera captures to `/v1/recognitions/identify`.

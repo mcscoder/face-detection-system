@@ -47,7 +47,7 @@ Về giao tiếp HTTP, API nên dùng hai dạng payload rõ ràng. Với CRUD m
 
 ### Chọn model cho GPU 8GB
 
-Với máy local chỉ có một GPU NVIDIA 8GB, lựa chọn model pack nên ưu tiên **inference ổn định, footprint vừa phải, chất lượng đủ cao**. Từ model zoo chính thức của InsightFace, `buffalo_l` có kích thước khoảng **326MB**, `buffalo_m` khoảng **313MB**, `buffalo_s` khoảng **159MB**; tài liệu cũng nêu `buffalo_m` có độ chính xác công bố tương đương `buffalo_l`, trong khi `buffalo_s` thấp hơn đáng kể ở các bảng accuracy. Với bối cảnh local demo trên một GPU tầm trung, **`buffalo_m` là lựa chọn mặc định khuyến nghị**: đủ nhỏ để triển khai nhẹ hơn `buffalo_l`, nhưng không phải hy sinh accuracy như `buffalo_s`. Đây là một suy luận kiến trúc hợp lý từ model pack size và accuracy công bố.
+Với máy local chỉ có một GPU NVIDIA 8GB, lựa chọn model pack nên ưu tiên **inference ổn định, footprint vừa phải, chất lượng đủ cao**. Từ model zoo chính thức của InsightFace, `buffalo_l` có kích thước khoảng **326MB**, `buffalo_m` khoảng **313MB**, `buffalo_s` khoảng **159MB**; tài liệu cũng nêu `buffalo_m` có độ chính xác công bố tương đương `buffalo_l`, trong khi `buffalo_s` thấp hơn đáng kể ở các bảng accuracy. Với bối cảnh local demo trên một GPU 8GB, **`buffalo_l` là lựa chọn mặc định khuyến nghị** vì vẫn nhỏ cho môi trường local nhưng dùng detector pack mạnh hơn.
 
 Một chi tiết quan trọng khác là **license**. Mã nguồn InsightFace Python Library mang giấy phép MIT, nhưng các **pretrained models** do họ cung cấp được ghi rõ là dành cho **non-commercial research purposes only**. Với đồ án học tập thì điều này thường không phải vấn đề, nhưng nếu sau này bạn muốn biến sản phẩm thành thương mại hoặc triển khai thật cho doanh nghiệp, bạn cần xem lại licensing của model pack hoặc chuyển sang model có quyền sử dụng thương mại phù hợp.
 
@@ -290,7 +290,7 @@ Thiết kế này vừa giữ được các cột phổ biến để query đơn
 | `id` | UUID | định danh template |
 | `person_id` | UUID FK | liên kết tới người |
 | `embedding` | vector(512) | vector khuôn mặt |
-| `model_pack` | text | ví dụ `buffalo_m` |
+| `model_pack` | text | ví dụ `buffalo_l` |
 | `model_version` | text | version model / pipeline |
 | `quality_score` | numeric | điểm chất lượng ảnh enrollment |
 | `source_image_path` | text nullable | nếu lưu ảnh nguồn |
@@ -462,7 +462,7 @@ Trạng thái hiện tại của dự án so với tiêu chí v1:
 Nếu chỉ chốt một cấu hình triển khai cho đồ án này, tôi sẽ chọn:
 - **Python FastAPI** cho server;
 - **InsightFace + ONNX Runtime GPU** cho inference;
-- **`buffalo_m`** làm model pack mặc định;
+- **`buffalo_l`** làm model pack mặc định;
 - **PostgreSQL + pgvector + JSONB** cho dữ liệu;
 - **Flutter mobile** làm đường demo chính;
 - **Flutter web** làm đường demo phụ trên localhost hoặc HTTPS local;
